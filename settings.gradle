@@ -1,2 +1,3 @@
+include ':EfuelingLibrary'
 include ':app'
 rootProject.name = "EpumpConnection"

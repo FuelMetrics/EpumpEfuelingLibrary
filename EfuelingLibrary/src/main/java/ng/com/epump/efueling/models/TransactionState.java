@@ -1,4 +1,4 @@
-package ng.com.epump.epumpconnection;
+package ng.com.epump.efueling.models;
 
 public class TransactionState {
     public static final int ST_INIT = 0;
