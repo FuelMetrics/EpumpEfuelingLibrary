@@ -99,7 +99,15 @@ public class MainActivity extends AppCompatActivity implements IData {
                     else if (transactionType == TransactionType.Remis.ordinal()){
                         transactionType1 = TransactionType.Remis;
                     }
-                    String uid = String.valueOf(nu.genNum());
+                    else if (transactionType == TransactionType.Offline_Voucher.ordinal()){
+                        transactionType1 = TransactionType.Offline_Voucher;
+                    }
+                    else if (transactionType == TransactionType.Offline_Card.ordinal()){
+                        transactionType1 = TransactionType.Offline_Card;
+                    }
+                    else if (transactionType == TransactionType.Offline_Remis.ordinal()){
+                        transactionType1 = TransactionType.Offline_Remis;
+                    }
                     int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, 10);
                     if (done > 0){
                         Toast.makeText(context, "WIFI not available", Toast.LENGTH_LONG).show();

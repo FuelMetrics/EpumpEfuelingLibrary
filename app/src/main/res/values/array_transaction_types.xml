@@ -4,5 +4,8 @@
         <item>Voucher</item>
         <item>Card</item>
         <item>Remis</item>
+        <item>Offline Voucher</item>
+        <item>Offline Card</item>
+        <item>Offline Remis</item>
     </string-array>
 </resources>

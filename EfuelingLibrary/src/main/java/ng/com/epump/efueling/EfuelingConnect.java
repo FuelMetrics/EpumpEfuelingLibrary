@@ -28,11 +28,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Calendar;
+import java.util.Date;
 
 import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.interfaces.JNICallbackInterface;
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.TransactionType;
+import ng.com.epump.efueling.models.ValueType;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
 public class EfuelingConnect implements JNICallbackInterface {
@@ -153,7 +156,9 @@ public class EfuelingConnect implements JNICallbackInterface {
                             Intent intent = new Intent("get_States");
                             intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
                             intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
-                            intent.putExtra("transaction_error", nativeLibJava.ep_get_cur_state_string());
+                            intent.putExtra("transaction_state_string", nativeLibJava.ep_get_cur_state_string());
+                            intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
+                            intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
                             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                             /*runOnUiThread(new Runnable() {
                                 @Override
@@ -272,7 +277,18 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (wifiAvailability == 0) {
             Intent intent = new Intent(mContext, TransactionActivity.class);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
-            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, amount);
+
+            int yy = Calendar.getInstance().get(Calendar.YEAR);
+            int mon = Calendar.getInstance().get(Calendar.MONTH);
+            int dd = Calendar.getInstance().get(Calendar.DATE);
+            int hh = Calendar.getInstance().get(Calendar.HOUR);
+            int mm = Calendar.getInstance().get(Calendar.MINUTE);
+            int ss = Calendar.getInstance().get(Calendar.SECOND);
+            yy = yy - 2000;
+            int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
+            Log.i("TAG", "startTransaction: time - " + time);
+
+            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), amount, time, "2101LH95");
         }
         return wifiAvailability;
     }
