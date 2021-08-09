@@ -28,6 +28,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Calendar;
+import java.util.Date;
 
 import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.interfaces.JNICallbackInterface;
@@ -274,7 +276,18 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (wifiAvailability == 0) {
             Intent intent = new Intent(mContext, TransactionActivity.class);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
-            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, amount);
+
+            int yy = Calendar.getInstance().get(Calendar.YEAR);
+            int mon = Calendar.getInstance().get(Calendar.MONTH);
+            int dd = Calendar.getInstance().get(Calendar.DATE);
+            int hh = Calendar.getInstance().get(Calendar.HOUR);
+            int mm = Calendar.getInstance().get(Calendar.MINUTE);
+            int ss = Calendar.getInstance().get(Calendar.SECOND);
+
+            int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
+            Log.i("TAG", "startTransaction: time - " + time);
+
+            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, amount, time, "2101LH95");
         }
         return wifiAvailability;
     }

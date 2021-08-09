@@ -33,7 +33,8 @@ public class NativeLibJava {
     public native int ep_init();
     public native int ep_run();
     public native void ep_ms_timer();
-    public native int ep_start_trans(String pname, int transTy, String uid, float value);
+    public native int ep_start_trans(String pname, int transTy, String uid, float value, int time_int, String term_id);
+    public native int ep_get_time_int(int ss, int mm, int hh, int dd, int mn, int yy);
     public native int ep_end_trans();
     public native int ep_get_cur_state();
     public native String ep_get_cur_state_string();
