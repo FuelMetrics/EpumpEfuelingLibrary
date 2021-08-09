@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -43,6 +44,11 @@ public class TransactionActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    Log.i("TAG", "run: pumpState " + pumpState);
+                    Log.i("TAG", "run: transactionState " + transactionState);
+                    Log.i("TAG", "run: errorString " + errorString);
+                    Log.i("TAG", "run: amount " + amount);
+                    Log.i("TAG", "run: volume " + volume);
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
                     if (pumpState == 8) {
