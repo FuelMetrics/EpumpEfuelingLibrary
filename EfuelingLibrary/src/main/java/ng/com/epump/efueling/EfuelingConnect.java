@@ -35,6 +35,7 @@ import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.interfaces.JNICallbackInterface;
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.TransactionType;
+import ng.com.epump.efueling.models.ValueType;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
 public class EfuelingConnect implements JNICallbackInterface {
@@ -155,9 +156,9 @@ public class EfuelingConnect implements JNICallbackInterface {
                             Intent intent = new Intent("get_States");
                             intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
                             intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
-                            intent.putExtra("transaction_error", nativeLibJava.ep_get_cur_state_string());
-                            intent.putExtra("transaction_volume", nativeLibJava.ep_get_vol_sold());
-                            intent.putExtra("transaction_amount", nativeLibJava.ep_get_amo_sold());
+                            intent.putExtra("transaction_state_string", nativeLibJava.ep_get_cur_state_string());
+                            intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
+                            intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
                             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                             /*runOnUiThread(new Runnable() {
                                 @Override
@@ -283,11 +284,11 @@ public class EfuelingConnect implements JNICallbackInterface {
             int hh = Calendar.getInstance().get(Calendar.HOUR);
             int mm = Calendar.getInstance().get(Calendar.MINUTE);
             int ss = Calendar.getInstance().get(Calendar.SECOND);
-
+            yy = yy - 2000;
             int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
             Log.i("TAG", "startTransaction: time - " + time);
 
-            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, amount, time, "2101LH95");
+            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), amount, time, "2101LH95");
         }
         return wifiAvailability;
     }
