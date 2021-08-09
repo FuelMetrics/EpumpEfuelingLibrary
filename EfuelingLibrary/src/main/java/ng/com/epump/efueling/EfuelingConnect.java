@@ -154,6 +154,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                             intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
                             intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
                             intent.putExtra("transaction_error", nativeLibJava.ep_get_cur_state_string());
+                            intent.putExtra("transaction_volume", nativeLibJava.ep_get_vol_sold());
+                            intent.putExtra("transaction_amount", nativeLibJava.ep_get_amo_sold());
                             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                             /*runOnUiThread(new Runnable() {
                                 @Override
