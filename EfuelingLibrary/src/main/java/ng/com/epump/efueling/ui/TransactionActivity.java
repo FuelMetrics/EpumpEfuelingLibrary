@@ -24,11 +24,13 @@ public class TransactionActivity extends AppCompatActivity {
     private Context context;
     private LinearLayout layoutTrans;
     private ProgressBar progressBar;
-    private TextView txtPumpState, txtTransState, txtProgress, txtAuthorizedAmount, txtVolume, txtAmount;
+    private TextView txtPumpState, txtTransState, txtProgress, txtAuthorizedAmount, txtVolume,
+            txtAmount, txtValueType;
     private Button button;
     private int pumpState, transactionState;
     private String stateString = "";
-    private double amount = 0, volume = 0, transAmount = 0;
+    private double amount = 0, volume = 0, transValue = 0;
+    private String transType;
     private int percentage = 0;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
@@ -36,26 +38,36 @@ public class TransactionActivity extends AppCompatActivity {
             pumpState = intent.getIntExtra("pump_state", 0);
             transactionState = intent.getIntExtra("transaction_state", 0);
             stateString = intent.getStringExtra("transaction_state_string");
-            if (transactionState == TransactionState.ST_PUMP_AUTH){
-                transAmount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_amount", 0f)).toString());
+            if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING){
+                transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
+                transType = String.valueOf(intent.getByteExtra("transaction_type", (byte) 0x00));
             }
             if (transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                 amount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("amount_sold", 0f)).toString());
                 volume = Double.parseDouble(Float.valueOf(intent.getFloatExtra("volume_sold", 0f)).toString());
 
-                if (transAmount > 0 && amount > 0){
-                    percentage = (int)((amount / transAmount) * 100);
+                if (transType.equalsIgnoreCase("97")) {
+                    txtValueType.setText("Amount Authorized");
+                    if (transValue > 0 && amount > 0) {
+                        percentage = (int) ((amount / transValue) * 100);
+                    }
+                }
+                else if (transType.equalsIgnoreCase("118")) {
+                    txtValueType.setText("Volume Authorized");
+                    if (transValue > 0 && volume > 0) {
+                        percentage = (int) ((volume / transValue) * 100);
+                    }
                 }
             }
 
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
+                    if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                         layoutTrans.setVisibility(View.VISIBLE);
                         txtAmount.setText(String.valueOf(amount));
-                        txtVolume.setText(String.valueOf(txtVolume));
-                        txtAuthorizedAmount.setText(String.valueOf(transAmount));
+                        txtVolume.setText(String.valueOf(volume));
+                        txtAuthorizedAmount.setText(String.valueOf(transValue));
                     }
                     else {
                         layoutTrans.setVisibility(View.GONE);
@@ -101,6 +113,7 @@ public class TransactionActivity extends AppCompatActivity {
         txtAuthorizedAmount = findViewById(R.id.txtAuthorizedAmount);
         txtVolume = findViewById(R.id.txtVolume);
         txtAmount = findViewById(R.id.txtAmount);
+        txtValueType = findViewById(R.id.txtValueType);
         button = findViewById(R.id.button);
 
         button.setOnClickListener(new View.OnClickListener() {

@@ -22,9 +22,9 @@ public class TransactionState {
             case ST_REQUESTING_FROM_SERVER:
                 return "Processing request";
             case ST_PUMP_AUTH:
-                return "Transaction authorized";
+                return "Transaction authorized, Pick Up Nozzle ";
             case ST_PUMP_FILLING:
-                return "Transaction started";
+                return "Transaction in progress";
             case ST_PUMP_FILL_COMP:
                 return "Transaction completed";
             case ST_NULL:
