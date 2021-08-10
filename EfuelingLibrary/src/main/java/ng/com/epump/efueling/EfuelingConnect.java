@@ -18,6 +18,7 @@ import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
@@ -52,9 +53,13 @@ public class EfuelingConnect implements JNICallbackInterface {
     private CountDownTimer countDownTimer;
     private int wifiAvailability = 1;
     private boolean disposed;
+    private Activity activity;
 
     private EfuelingConnect(Context context){
         this.mContext = context;
+        if (context instanceof Activity){
+            this.activity = (Activity) context;
+        }
     }
 
     public static EfuelingConnect getInstance(Context context){
@@ -89,14 +94,19 @@ public class EfuelingConnect implements JNICallbackInterface {
         data_interface.tx_data(data, len);*/
     }
 
-    public void turnWifi(boolean state){
-        wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
-            ((Activity)mContext).startActivityForResult(panelIntent, 223);
-        } else {
-            wifiManager.setWifiEnabled(state);
-        }
+    public void turnWifi(final boolean state){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+                    ((Activity)mContext).startActivityForResult(panelIntent, 223);
+                } else {
+                    wifiManager.setWifiEnabled(state);
+                }
+            }
+        }).start();
     }
 
     public void connect2WifiAndSocket(String ssid, String password, final String ipAddress){
@@ -134,7 +144,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     wifiAvailability = 0;
                     connectivityManager.bindProcessToNetwork(network);
                     nativeLibJava.registerCallbacks();
-                    int res = nativeLibJava.ep_init();
+                    int res = nativeLibJava.ep_init("", "");
                     if (res == 0){
                         data_interface.initComplete(true);
                         /*runOnUiThread(new Runnable() {
@@ -159,6 +169,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                             intent.putExtra("transaction_state_string", nativeLibJava.ep_get_cur_state_string());
                             intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
                             intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
+                            intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
+                            intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
                             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                             /*runOnUiThread(new Runnable() {
                                 @Override
@@ -273,24 +285,35 @@ public class EfuelingConnect implements JNICallbackInterface {
         thread.start();
     }
 
-    public int startTransaction(TransactionType transactionType, String pumpName, String tag, float amount) {
+    public int startTransaction(final TransactionType transactionType, final String pumpName,
+                                final String tag, final float amount) {
         if (wifiAvailability == 0) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    int yy = Calendar.getInstance().get(Calendar.YEAR);
+                    int mon = Calendar.getInstance().get(Calendar.MONTH);
+                    int dd = Calendar.getInstance().get(Calendar.DATE);
+                    int hh = Calendar.getInstance().get(Calendar.HOUR);
+                    int mm = Calendar.getInstance().get(Calendar.MINUTE);
+                    int ss = Calendar.getInstance().get(Calendar.SECOND);
+                    yy = yy - 2000;
+                    int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
+                    Log.i("TAG", "startTransaction: time - " + time);
+
+                    nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), amount, time, "2101LH95");
+                }
+            }).start();
+
             Intent intent = new Intent(mContext, TransactionActivity.class);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
-
-            int yy = Calendar.getInstance().get(Calendar.YEAR);
-            int mon = Calendar.getInstance().get(Calendar.MONTH);
-            int dd = Calendar.getInstance().get(Calendar.DATE);
-            int hh = Calendar.getInstance().get(Calendar.HOUR);
-            int mm = Calendar.getInstance().get(Calendar.MINUTE);
-            int ss = Calendar.getInstance().get(Calendar.SECOND);
-            yy = yy - 2000;
-            int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
-            Log.i("TAG", "startTransaction: time - " + time);
-
-            nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), amount, time, "2101LH95");
         }
         return wifiAvailability;
+    }
+
+    public void continueTransaction(){
+        Intent intent = new Intent(mContext, TransactionActivity.class);
+        ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
     }
 
     public void dispose() {
