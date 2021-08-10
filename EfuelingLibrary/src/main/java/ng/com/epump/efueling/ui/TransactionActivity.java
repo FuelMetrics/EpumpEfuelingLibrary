@@ -12,11 +12,13 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import ng.com.epump.efueling.R;
+import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
 import ng.com.epump.efueling.models.TransactionState;
 
@@ -24,14 +26,16 @@ public class TransactionActivity extends AppCompatActivity {
     private Context context;
     private LinearLayout layoutTrans;
     private ProgressBar progressBar;
-    private TextView txtPumpState, txtTransState, txtProgress, txtAuthorizedAmount, txtVolume,
+    private TextView txtTransState, txtProgress, txtAuthorizedAmount, txtVolume,
             txtAmount, txtValueType;
-    private Button button;
+    private Button btnEndTrans;
+    private ImageView imgDismiss;
     private int pumpState, transactionState;
     private String stateString = "";
     private double amount = 0, volume = 0, transValue = 0;
     private String transType;
     private int percentage = 0;
+    private int return_value;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -80,11 +84,15 @@ public class TransactionActivity extends AppCompatActivity {
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
                     if (pumpState == 8) {
-                        transState = transState + stateString;
+                        transState = Error.getError(stateString);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            txtTransState.setTextColor(getColor(R.color.colorRed));
+                        }
+                        else{
+                            txtTransState.setTextColor(getResources().getColor(R.color.colorRed));
+                        }
                     }
                     txtTransState.setText(transState);
-
-                    txtPumpState.setText(pState);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         progressBar.setProgress(percentage, true);
@@ -106,7 +114,6 @@ public class TransactionActivity extends AppCompatActivity {
         context = this;
 
         layoutTrans = findViewById(R.id.layoutTrans);
-        txtPumpState = findViewById(R.id.txtPumpState);
         txtTransState = findViewById(R.id.txtTransState);
         progressBar = findViewById(R.id.progressBar);
         txtProgress = findViewById(R.id.txtProgress);
@@ -114,11 +121,23 @@ public class TransactionActivity extends AppCompatActivity {
         txtVolume = findViewById(R.id.txtVolume);
         txtAmount = findViewById(R.id.txtAmount);
         txtValueType = findViewById(R.id.txtValueType);
-        button = findViewById(R.id.button);
+        btnEndTrans = findViewById(R.id.btnEndTrans);
+        imgDismiss = findViewById(R.id.imgDismiss);
 
-        button.setOnClickListener(new View.OnClickListener() {
+        btnEndTrans.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                return_value = -1;
+                setResult(return_value);
+                finish();
+            }
+        });
+
+        imgDismiss.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                return_value = 0;
+                setResult(return_value);
                 finish();
             }
         });

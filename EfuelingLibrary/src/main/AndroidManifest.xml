@@ -9,9 +9,10 @@
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application>
+    <application
+        android:theme="@style/AppTheme">
         <activity android:name=".ui.TransactionActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

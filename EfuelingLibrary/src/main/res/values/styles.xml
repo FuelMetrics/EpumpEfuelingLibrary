@@ -2,11 +2,31 @@
 <resources>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:textViewStyle">@style/TextStyle</item>
+        <item name="buttonStyle">@style/Button</item>
     </style>
+
+
     <style name="CircularProgressBar">
         <item name="android:indeterminateOnly">false</item>
         <item name="android:progressDrawable">@drawable/circle</item>
+    </style>
+
+    <style name="TextStyle" parent="android:style/TextAppearance.Material">
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:fontFamily">@font/nunito</item>
+    </style>
+
+    <style name="Button" parent="android:style/Widget.Material.Button">
+        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_height">48sp</item>
+        <item name="android:padding">17sp</item>
+        <item name="android:layout_margin">20sp</item>
     </style>
 </resources>

@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity implements IData {
     Activity activity;
     NumUtil nu;
     EfuelingConnect efuelingConnect;
-    int transactionType;
+    int transactionType, mResultCode = -1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,34 +88,39 @@ public class MainActivity extends AppCompatActivity implements IData {
         btnMessage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String tag = txtTag.getText().toString();
-                if (!tag.isEmpty()){
-                    TransactionType transactionType1 = null;
-                    if (transactionType == TransactionType.Voucher.ordinal()){
-                        transactionType1 = TransactionType.Voucher;
-                    }
-                    else if (transactionType == TransactionType.Card.ordinal()){
-                        transactionType1 = TransactionType.Card;
-                    }
-                    else if (transactionType == TransactionType.Remis.ordinal()){
-                        transactionType1 = TransactionType.Remis;
-                    }
-                    else if (transactionType == TransactionType.Offline_Voucher.ordinal()){
-                        transactionType1 = TransactionType.Offline_Voucher;
-                    }
-                    else if (transactionType == TransactionType.Offline_Card.ordinal()){
-                        transactionType1 = TransactionType.Offline_Card;
-                    }
-                    else if (transactionType == TransactionType.Offline_Remis.ordinal()){
-                        transactionType1 = TransactionType.Offline_Remis;
-                    }
-                    int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, 10);
-                    if (done > 0){
-                        Toast.makeText(context, "WIFI not available", Toast.LENGTH_LONG).show();
-                    }
+                if (mResultCode > -1){
+                    efuelingConnect.continueTransaction();
                 }
                 else{
-                    Toast.makeText(context, "Input tag", Toast.LENGTH_LONG).show();
+                    String tag = txtTag.getText().toString();
+                    if (!tag.isEmpty()){
+                        TransactionType transactionType1 = null;
+                        if (transactionType == TransactionType.Voucher.ordinal()){
+                            transactionType1 = TransactionType.Voucher;
+                        }
+                        else if (transactionType == TransactionType.Card.ordinal()){
+                            transactionType1 = TransactionType.Card;
+                        }
+                        else if (transactionType == TransactionType.Remis.ordinal()){
+                            transactionType1 = TransactionType.Remis;
+                        }
+                        else if (transactionType == TransactionType.Offline_Voucher.ordinal()){
+                            transactionType1 = TransactionType.Offline_Voucher;
+                        }
+                        else if (transactionType == TransactionType.Offline_Card.ordinal()){
+                            transactionType1 = TransactionType.Offline_Card;
+                        }
+                        else if (transactionType == TransactionType.Offline_Remis.ordinal()){
+                            transactionType1 = TransactionType.Offline_Remis;
+                        }
+                        int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, 10);
+                        if (done > 0){
+                            Toast.makeText(context, "WIFI not available", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                    else{
+                        Toast.makeText(context, "Input tag", Toast.LENGTH_LONG).show();
+                    }
                 }
             }
         });
@@ -130,8 +135,11 @@ public class MainActivity extends AppCompatActivity implements IData {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == TRANSACTION_START){
-            if (efuelingConnect != null) {
-                efuelingConnect.dispose();
+            mResultCode = resultCode;
+            if (resultCode == -1) {
+                if (efuelingConnect != null) {
+                    efuelingConnect.dispose();
+                }
             }
         }
     }

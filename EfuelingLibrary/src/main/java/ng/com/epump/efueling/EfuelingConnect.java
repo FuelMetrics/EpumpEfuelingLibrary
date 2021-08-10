@@ -144,7 +144,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     wifiAvailability = 0;
                     connectivityManager.bindProcessToNetwork(network);
                     nativeLibJava.registerCallbacks();
-                    int res = nativeLibJava.ep_init();
+                    int res = nativeLibJava.ep_init("", "");
                     if (res == 0){
                         data_interface.initComplete(true);
                         /*runOnUiThread(new Runnable() {
@@ -309,6 +309,11 @@ public class EfuelingConnect implements JNICallbackInterface {
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
         }
         return wifiAvailability;
+    }
+
+    public void continueTransaction(){
+        Intent intent = new Intent(mContext, TransactionActivity.class);
+        ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
     }
 
     public void dispose() {
