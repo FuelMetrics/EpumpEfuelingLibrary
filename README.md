@@ -1,4 +1,7 @@
 # EpumpEfuelingLibrary
 
-This branch is used to update the Shared library (.so) after development, modification or upgrade
+Upon Setting up the library
+
+To start interaction with the library call the line below;
+EfuelingConnect efuelingConnect = EfuelingConnect.getInstance(context);
 

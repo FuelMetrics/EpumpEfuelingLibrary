@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -121,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements IData {
 
         efuelingConnect = EfuelingConnect.getInstance(context);
 
-        /*IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
-        context.registerReceiver(new NetworkStateReceiver(), intentFilter);*/
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        context.registerReceiver(new NetworkStateReceiver(), intentFilter);
     }
 
     @Override
