@@ -2,10 +2,12 @@
 <resources>
     <string-array name="transaction_types">
         <item>Voucher</item>
-        <item>Card</item>
         <item>Remis</item>
+        <item>Remis Card</item>
+        <item>POS</item>
         <item>Offline Voucher</item>
-        <item>Offline Card</item>
         <item>Offline Remis</item>
+        <item>Offline Remis Card</item>
+        <item>Offline POS</item>
     </string-array>
 </resources>

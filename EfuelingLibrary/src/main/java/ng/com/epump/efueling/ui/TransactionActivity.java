@@ -21,6 +21,8 @@ import ng.com.epump.efueling.R;
 import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
 import ng.com.epump.efueling.models.TransactionState;
+import ng.com.epump.efueling.models.Utility;
+import ng.com.epump.efueling.models.ValueType;
 
 public class TransactionActivity extends AppCompatActivity {
     private Context context;
@@ -31,33 +33,40 @@ public class TransactionActivity extends AppCompatActivity {
     private Button btnEndTrans;
     private ImageView imgDismiss;
     private int pumpState, transactionState;
-    private String stateString = "";
+    private String errorString = "";
     private double amount = 0, volume = 0, transValue = 0;
-    private String transType;
+    private int transType;
     private int percentage = 0;
     private int return_value;
+    private boolean transComplete, errorOccurred;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             pumpState = intent.getIntExtra("pump_state", 0);
             transactionState = intent.getIntExtra("transaction_state", 0);
-            stateString = intent.getStringExtra("transaction_state_string");
+            errorString = intent.getStringExtra("transaction_error_string");
             if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING){
                 transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
-                transType = String.valueOf(intent.getByteExtra("transaction_type", (byte) 0x00));
+                transType = intent.getByteExtra("transaction_type", (byte) 0x00);
             }
             if (transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                 amount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("amount_sold", 0f)).toString());
                 volume = Double.parseDouble(Float.valueOf(intent.getFloatExtra("volume_sold", 0f)).toString());
 
-                if (transType.equalsIgnoreCase("97")) {
+                if (transType == ValueType.Amount.ordinal()) {
                     txtValueType.setText("Amount Authorized");
+                    if (amount >= transValue){
+                        transComplete = true;
+                    }
                     if (transValue > 0 && amount > 0) {
                         percentage = (int) ((amount / transValue) * 100);
                     }
                 }
-                else if (transType.equalsIgnoreCase("118")) {
+                else if (transType == ValueType.Volume.ordinal()) {
                     txtValueType.setText("Volume Authorized");
+                    if (volume >= transValue){
+                        transComplete = true;
+                    }
                     if (transValue > 0 && volume > 0) {
                         percentage = (int) ((volume / transValue) * 100);
                     }
@@ -69,28 +78,38 @@ public class TransactionActivity extends AppCompatActivity {
                 public void run() {
                     if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                         layoutTrans.setVisibility(View.VISIBLE);
-                        txtAmount.setText(String.valueOf(amount));
-                        txtVolume.setText(String.valueOf(volume));
-                        txtAuthorizedAmount.setText(String.valueOf(transValue));
+                        txtAmount.setText(Utility.convert2DecimalString(amount, false));
+                        txtVolume.setText(String.format("%s L", Utility.convert2DecimalString(volume, false)));
+                        txtAuthorizedAmount.setText(Utility.convert2DecimalString(transValue, false));
                     }
                     else {
                         layoutTrans.setVisibility(View.GONE);
                     }
                     Log.i("TAG", "run: pumpState " + pumpState);
                     Log.i("TAG", "run: transactionState " + transactionState);
-                    Log.i("TAG", "run: errorString " + stateString);
+                    Log.i("TAG", "run: errorString " + errorString);
                     Log.i("TAG", "run: amount " + amount);
                     Log.i("TAG", "run: volume " + volume);
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
-                    if (pumpState == 8) {
-                        transState = Error.getError(stateString);
+                    if (pumpState == 8 || transactionState == 8) {
+                        transState = Error.getError(errorString);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             txtTransState.setTextColor(getColor(R.color.colorRed));
                         }
                         else{
                             txtTransState.setTextColor(getResources().getColor(R.color.colorRed));
                         }
+                        errorOccurred = true;
+                    }
+                    else {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            txtTransState.setTextColor(getColor(R.color.colorLibraryPrimary));
+                        }
+                        else{
+                            txtTransState.setTextColor(getResources().getColor(R.color.colorLibraryPrimary));
+                        }
+                        errorOccurred = false;
                     }
                     txtTransState.setText(transState);
 
@@ -111,6 +130,8 @@ public class TransactionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction);
+
+        setTheme(R.style.Library_Theme);
         context = this;
 
         layoutTrans = findViewById(R.id.layoutTrans);
@@ -136,7 +157,12 @@ public class TransactionActivity extends AppCompatActivity {
         imgDismiss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                return_value = 0;
+                if (transComplete || errorOccurred){
+                    return_value = -1;
+                }
+                else {
+                    return_value = 0;
+                }
                 setResult(return_value);
                 finish();
             }

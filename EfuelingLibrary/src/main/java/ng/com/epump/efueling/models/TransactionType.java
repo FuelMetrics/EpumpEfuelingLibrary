@@ -1,6 +1,6 @@
 package ng.com.epump.efueling.models;
 
 public enum TransactionType {
-    Voucher, Card, Remis, Offline_Voucher, Offline_Card, Offline_Remis
+    Voucher, Remis, Card, POS, Offline_Voucher, Offline_Remis, Offline_Card, Offline_POS
 }
 

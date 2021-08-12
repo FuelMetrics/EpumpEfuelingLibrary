@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorAccent">@color/colorAccent</item>
+    <style name="Library_Theme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/colorLibraryPrimary</item>
+        <item name="colorPrimary">@color/colorLibraryPrimary</item>
+        <item name="android:colorAccent">@color/colorLibraryAccent</item>
+        <item name="colorAccent">@color/colorLibraryAccent</item>
         <item name="android:fontFamily">@font/nunito</item>
         <item name="fontFamily">@font/nunito</item>
         <item name="android:textViewStyle">@style/TextStyle</item>
@@ -21,12 +23,11 @@
     </style>
 
     <style name="Button" parent="android:style/Widget.Material.Button">
-        <item name="android:textColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorLibraryPrimary</item>
         <item name="android:background">@drawable/button_background</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">20sp</item>
         <item name="android:layout_height">48sp</item>
-        <item name="android:padding">17sp</item>
         <item name="android:layout_margin">20sp</item>
     </style>
 </resources>

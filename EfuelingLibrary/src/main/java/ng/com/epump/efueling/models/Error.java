@@ -3,20 +3,27 @@ package ng.com.epump.efueling.models;
 public class Error {
     public static String getError(String error){
         String errorString = "";
-        String[] err = error.split(";");
+        if (error.startsWith("ERROR[")){
+            error = error.substring(6, error.length() - 1);
+        }
+        error = error.trim();
+        if (error.equalsIgnoreCase("NULL")){
+            return errorString;
+        }
+        String[] err = error.split(":");
         String errorType = err[0];
-        String errorCode = err[1];
-        String errorMessageCode = err[2];
+        int errorCode = Integer.parseInt(err[1]);
+        int errorMessageCode = Integer.parseInt(err[2]);
         if (errorType.equalsIgnoreCase(ErrorType.G.name())){
-            if (errorCode.equalsIgnoreCase(GoErrorType.EVT_SERVER_ERROR.name())){
-                errorString = ServerErrorType.getString(Integer.parseInt(errorMessageCode));
+            if (errorCode == GoErrorType.EVT_SERVER_ERROR.ordinal()){
+                errorString = ServerErrorType.getString(errorMessageCode);
             }
-            else if (errorCode.equalsIgnoreCase(GoErrorType.EVT_SOCKET_ERROR.name())){
+            else if (errorCode == GoErrorType.EVT_SOCKET_ERROR.ordinal()){
                 errorString = "Network Error";
             }
         }
-        else if (errorType.equalsIgnoreCase(ErrorType.G.name())){
-            errorString = "Library Error - " + errorCode;
+        else if (errorType.equalsIgnoreCase(ErrorType.L.name())){
+            errorString = "Library - " + LibraryErrorType.getString(errorCode);
         }
         return errorString;
     }

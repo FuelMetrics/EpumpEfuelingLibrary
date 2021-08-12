@@ -95,8 +95,7 @@ public class ServerErrorType {
             case POSReferenceNotFound:
                 return "POS Reference Not Found";
             default:
-                break;
+                return "Unknown server error";
         }
-        return "";
     }
 }

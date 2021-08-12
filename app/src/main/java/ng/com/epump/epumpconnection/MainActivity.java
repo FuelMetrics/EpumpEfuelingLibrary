@@ -22,6 +22,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.security.SecureRandom;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -29,6 +30,7 @@ import java.util.Set;
 import ng.com.epump.efueling.EfuelingConnect;
 import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.models.TransactionType;
+import ng.com.epump.efueling.models.Utility;
 
 import static ng.com.epump.efueling.EfuelingConnect.TRANSACTION_START;
 
@@ -93,27 +95,42 @@ public class MainActivity extends AppCompatActivity implements IData {
                 }
                 else{
                     String tag = txtTag.getText().toString();
+                    float amount = 10;
                     if (!tag.isEmpty()){
+                        RandomGenerator rdg = new RandomGenerator(8, new SecureRandom());
+                        String uniqueTg = rdg.nextString();
                         TransactionType transactionType1 = null;
                         if (transactionType == TransactionType.Voucher.ordinal()){
                             transactionType1 = TransactionType.Voucher;
                         }
+                        else if (transactionType == TransactionType.Remis.ordinal()){
+                            tag = tag + "|" + uniqueTg;
+                            transactionType1 = TransactionType.Remis;
+                        }
                         else if (transactionType == TransactionType.Card.ordinal()){
+                            String pin = Utility.padPassword("1234");
+                            tag = tag + "|" + pin + "|" + amount + "|" + uniqueTg;
                             transactionType1 = TransactionType.Card;
                         }
-                        else if (transactionType == TransactionType.Remis.ordinal()){
-                            transactionType1 = TransactionType.Remis;
+                        else if (transactionType == TransactionType.POS.ordinal()){
+                            transactionType1 = TransactionType.POS;
                         }
                         else if (transactionType == TransactionType.Offline_Voucher.ordinal()){
                             transactionType1 = TransactionType.Offline_Voucher;
                         }
-                        else if (transactionType == TransactionType.Offline_Card.ordinal()){
-                            transactionType1 = TransactionType.Offline_Card;
-                        }
                         else if (transactionType == TransactionType.Offline_Remis.ordinal()){
+                            tag = tag + "|" + uniqueTg;
                             transactionType1 = TransactionType.Offline_Remis;
                         }
-                        int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, 10);
+                        else if (transactionType == TransactionType.Offline_Card.ordinal()){
+                            String pin = Utility.padPassword("1234");
+                            tag = tag + "|" + pin + "|" + amount + "|" + uniqueTg;
+                            transactionType1 = TransactionType.Offline_Card;
+                        }
+                        else if (transactionType == TransactionType.Offline_POS.ordinal()){
+                            transactionType1 = TransactionType.Offline_POS;
+                        }
+                        int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, amount);
                         if (done > 0){
                             Toast.makeText(context, "WIFI not available", Toast.LENGTH_LONG).show();
                         }
@@ -162,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements IData {
         });
     }
 
-    public class NetworkStateReceiver extends BroadcastReceiver
+    public static class NetworkStateReceiver extends BroadcastReceiver
     {
         public void onReceive(Context context, Intent intent)
         {
@@ -170,10 +187,15 @@ public class MainActivity extends AppCompatActivity implements IData {
 
             ConnectivityManager conMan = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo netInfo = conMan.getActiveNetworkInfo();
-            if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI)
+
+            if (netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI) {
+                //wifiSwitch.setChecked(true);
                 Log.d("WifiReceiver", "Have Wifi Connection");
-            else
+            }
+            else {
+                //wifiSwitch.setChecked(false);
                 Log.d("WifiReceiver", "Don't have Wifi Connection");
+            }
 
             /*if(intent.getExtras() != null)
             {
