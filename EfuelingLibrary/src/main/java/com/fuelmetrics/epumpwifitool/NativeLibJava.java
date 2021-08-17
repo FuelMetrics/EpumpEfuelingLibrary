@@ -31,22 +31,26 @@ public class NativeLibJava {
      * each API description
      * ------------------------- */
     public native int ep_init(String did, String dk);
+    public native int ep_deinit();
     public native int ep_run();
     public native void ep_ms_timer();
-    public native int ep_start_trans(String pname, int transTy, String uid, byte val_ty, float value, int time_int, String term_id);
-    public native int ep_get_time_int(int ss, int mm, int hh, int dd, int mn, int yy);
-    public native float ep_get_value();
-    public native byte ep_get_value_ty();
+    public native int ep_get_time_int(int ss, int mm, int hh,
+                                      int dd, int mn, int yy);
+    public native int ep_start_trans(String pname, int transTy,
+                                     String uid, byte val_ty,
+                                     float value, int time_int, String term_id);
+
     public native int ep_end_trans();
     public native int ep_get_cur_state();
     public native String ep_get_cur_state_string();
     public native int ep_get_pump_state();
     public native float ep_get_vol_sold();
     public native float ep_get_amo_sold();
+    public native float ep_get_value();
+    public native byte ep_get_value_ty();
     public native String ep_get_err_details();
+    public native String ep_get_session_id();
 
-    public native int ep_check_avail_evt();
-    public native Object ep_get_avail_evt();
     public native int ep_rx_data(String data, int len);
 
     public native Object ep_get_connection_data(String pumpname);
