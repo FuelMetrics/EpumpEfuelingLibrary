@@ -38,7 +38,7 @@ public class TransactionActivity extends AppCompatActivity {
     private int transType;
     private int percentage = 0;
     private int return_value;
-    private boolean transComplete, errorOccurred;
+    private boolean transComplete, errorOccurred, transactionStarted;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,12 +49,11 @@ public class TransactionActivity extends AppCompatActivity {
                 transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
                 transType = intent.getByteExtra("transaction_type", (byte) 0x00);
                 sessionId = intent.getStringExtra("transaction_session_id");
-
             }
             if (transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                 amount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("amount_sold", 0f)).toString());
                 volume = Double.parseDouble(Float.valueOf(intent.getFloatExtra("volume_sold", 0f)).toString());
-
+                transactionStarted = true;
                 if (transType == ValueType.Amount.ordinal()) {
                     txtValueType.setText("Amount Authorized");
                     if (amount >= transValue){
@@ -166,6 +165,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
+                returnData.putExtra("transactionStarted", transactionStarted);
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();

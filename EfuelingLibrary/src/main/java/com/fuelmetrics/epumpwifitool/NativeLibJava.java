@@ -1,8 +1,5 @@
 package com.fuelmetrics.epumpwifitool;
 
-
-import ng.com.epump.efueling.interfaces.JNICallbackInterface;
-
 public class NativeLibJava {
     JNICallbackInterface cbInterface;
 

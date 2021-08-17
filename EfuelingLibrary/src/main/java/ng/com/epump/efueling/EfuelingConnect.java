@@ -30,7 +30,7 @@ import java.net.Socket;
 import java.util.Calendar;
 
 import ng.com.epump.efueling.interfaces.IData;
-import ng.com.epump.efueling.interfaces.JNICallbackInterface;
+import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.ValueType;
@@ -52,7 +52,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private boolean disposed;
     private Activity activity;
     private String mDailyKey;
-    private String mTerminalId = "2101LH95";
+    private String mTerminalId;
 
     private EfuelingConnect(Context context){
         this.mContext = context;
