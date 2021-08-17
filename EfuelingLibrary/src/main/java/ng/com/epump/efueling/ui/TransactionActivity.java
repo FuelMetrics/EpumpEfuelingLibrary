@@ -33,7 +33,7 @@ public class TransactionActivity extends AppCompatActivity {
     private Button btnEndTrans;
     private ImageView imgDismiss;
     private int pumpState, transactionState;
-    private String errorString = "";
+    private String errorString = "", sessionId = "";
     private double amount = 0, volume = 0, transValue = 0;
     private int transType;
     private int percentage = 0;
@@ -48,6 +48,8 @@ public class TransactionActivity extends AppCompatActivity {
             if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING){
                 transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
                 transType = intent.getByteExtra("transaction_type", (byte) 0x00);
+                sessionId = intent.getStringExtra("transaction_session_id");
+
             }
             if (transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                 amount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("amount_sold", 0f)).toString());
@@ -159,8 +161,13 @@ public class TransactionActivity extends AppCompatActivity {
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent returnData = new Intent();
+                returnData.putExtra("sessionId", sessionId);
+                returnData.putExtra("volume", volume);
+                returnData.putExtra("amount", amount);
+                returnData.putExtra("transactionValue", transValue);
                 return_value = -1;
-                setResult(return_value);
+                setResult(return_value, returnData);
                 finish();
             }
         });
@@ -168,13 +175,18 @@ public class TransactionActivity extends AppCompatActivity {
         imgDismiss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Intent returnData = new Intent();
+                returnData.putExtra("sessionId", sessionId);
+                returnData.putExtra("volume", volume);
+                returnData.putExtra("amount", amount);
+                returnData.putExtra("transactionValue", transValue);
                 if (transComplete || errorOccurred){
                     return_value = -1;
                 }
                 else {
                     return_value = 0;
                 }
-                setResult(return_value);
+                setResult(return_value, returnData);
                 finish();
             }
         });

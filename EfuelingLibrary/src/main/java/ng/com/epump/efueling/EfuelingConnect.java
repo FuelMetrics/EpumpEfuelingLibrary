@@ -180,6 +180,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                             intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
                             intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
                             intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
+                            intent.putExtra("transaction_session_id", nativeLibJava.ep_get_session_id());
                             LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
                             /*runOnUiThread(new Runnable() {
                                 @Override
@@ -222,8 +223,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                 public void onLost(@NonNull Network network) {
                     wifiAvailability = 2;
                     super.onLost(network);
-                    nativeLibJava.ep_end_trans();
-                    data_interface.initComplete(false);
+                    //nativeLibJava.ep_end_trans();
+                    //data_interface.initComplete(false);
                     /*runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -332,6 +333,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
             if (nativeLibJava != null){
                 nativeLibJava.ep_end_trans();
+                nativeLibJava.ep_deinit();
             }
 
             try {
@@ -345,6 +347,12 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
 
             turnWifi(false);
+        }
+    }
+
+    public void stopTransaction(){
+        if (nativeLibJava != null){
+            nativeLibJava.ep_end_trans();
         }
     }
 }
