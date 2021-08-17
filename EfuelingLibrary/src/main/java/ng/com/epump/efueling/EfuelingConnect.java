@@ -68,10 +68,10 @@ public class EfuelingConnect implements JNICallbackInterface {
         return _connect;
     }
 
-    public void init(String dailyKey, String... terminalId){
+    public void init(String dailyKey, String terminalId){
         mDailyKey = dailyKey;
-        if (terminalId.length > 0 && !terminalId[0].isEmpty()){
-            mTerminalId = terminalId[0];
+        if (!terminalId.isEmpty()){
+            mTerminalId = terminalId;
         }
         if (disposed){
             disposed = false;
@@ -81,6 +81,10 @@ public class EfuelingConnect implements JNICallbackInterface {
         }
         nativeLibJava = new NativeLibJava(this);
         data_interface = (IData) mContext;
+    }
+
+    public void init(String dailyKey){
+        init(dailyKey, "");
     }
 
     @Override
@@ -326,7 +330,9 @@ public class EfuelingConnect implements JNICallbackInterface {
                 countDownTimer.cancel();
                 countDownTimer = null;
             }
-            nativeLibJava.ep_end_trans();
+            if (nativeLibJava != null){
+                nativeLibJava.ep_end_trans();
+            }
 
             try {
                 socket.close();

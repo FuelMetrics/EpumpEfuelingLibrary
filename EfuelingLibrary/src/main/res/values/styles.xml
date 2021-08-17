@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Library_Theme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:colorPrimary">@color/colorLibraryPrimary</item>
-        <item name="colorPrimary">@color/colorLibraryPrimary</item>
-        <item name="android:colorAccent">@color/colorLibraryAccent</item>
-        <item name="colorAccent">@color/colorLibraryAccent</item>
+        <item name="android:colorPrimary">@color/libraryColorPrimary</item>
+        <item name="colorPrimary">@color/libraryColorPrimary</item>
+        <item name="android:colorAccent">@color/libraryColorAccent</item>
+        <item name="colorAccent">@color/libraryColorAccent</item>
         <item name="android:fontFamily">@font/nunito</item>
         <item name="fontFamily">@font/nunito</item>
         <item name="android:textViewStyle">@style/TextStyle</item>
@@ -14,7 +14,7 @@
 
     <style name="CircularProgressBar">
         <item name="android:indeterminateOnly">false</item>
-        <item name="android:progressDrawable">@drawable/circle</item>
+        <item name="android:progressDrawable">@drawable/library_circle</item>
     </style>
 
     <style name="TextStyle" parent="android:style/TextAppearance.Material">
@@ -23,8 +23,8 @@
     </style>
 
     <style name="Button" parent="android:style/Widget.Material.Button">
-        <item name="android:textColor">@color/colorLibraryPrimary</item>
-        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">@color/libraryColorPrimary</item>
+        <item name="android:background">@drawable/library_button_background</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">20sp</item>
         <item name="android:layout_height">48sp</item>

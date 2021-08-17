@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorWhite"
+    android:background="@color/libraryColorWhite"
     tools:context=".ui.TransactionActivity">
 
     <ImageView
@@ -14,7 +14,7 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_margin="30sp"
-        android:src="@drawable/ic_close"/>
+        android:src="@drawable/library_ic_close"/>
 
     <ImageView
         android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="-50sp"
         android:layout_marginRight="-50sp"
-        android:src="@drawable/ic_right" />
+        android:src="@drawable/library_ic_right" />
 
     <ImageView
         android:layout_width="wrap_content"
@@ -35,7 +35,7 @@
         android:layout_marginTop="-400sp"
         android:layout_marginStart="-67sp"
         android:layout_marginLeft="-67sp"
-        android:src="@drawable/ic_left" />
+        android:src="@drawable/library_ic_left" />
 
     <LinearLayout
         android:id="@+id/main"
@@ -58,7 +58,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_group_2597"/>
+                android:src="@drawable/library_ic_group_2597"/>
 
             <TextView
                 android:id="@+id/txtTransState"
@@ -70,7 +70,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:text="Transaction Started"
-                android:textColor="@color/colorLibraryPrimary"/>
+                android:textColor="@color/libraryColorPrimary"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -79,7 +79,7 @@
                 android:gravity="center"
                 android:textSize="16sp"
                 android:text="Monitor your fuel transaction here, don't forget to turn off your car engine"
-                android:textColor="@color/colorGray"/>
+                android:textColor="@color/libraryColorGray"/>
 
             <RelativeLayout
                 android:id="@+id/progress"
@@ -99,7 +99,7 @@
                     android:layout_height="wrap_content"
                     android:text="Volume"
                     android:textSize="14sp"
-                    android:textColor="@color/colorLibraryPrimary"
+                    android:textColor="@color/libraryColorPrimary"
                     android:layout_centerHorizontal="true"
                     android:layout_above="@id/txtVolume"/>
 
@@ -114,8 +114,8 @@
                     android:gravity="end"
                     android:text="00.00 L"
                     android:textSize="28sp"
-                    android:textColor="@color/colorLibraryPrimary"
-                    android:background="@drawable/gradient"
+                    android:textColor="@color/libraryColorPrimary"
+                    android:background="@drawable/library_gradient"
                     android:layout_centerInParent="true"
                     app:fontFamily="@font/digital"/>
 
@@ -127,7 +127,7 @@
                     android:layout_centerInParent="true"
                     android:layout_marginTop="25sp"
                     android:text="0%"
-                    android:textColor="@color/colorLibraryPrimary"
+                    android:textColor="@color/libraryColorPrimary"
                     android:textSize="20sp"
                     android:textStyle="bold"/>
             </RelativeLayout>
@@ -152,14 +152,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Amount Authorized"
-                        android:textColor="@color/colorGray"
+                        android:textColor="@color/libraryColorGray"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/txtAuthorizedAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorLibraryPrimary"
+                        android:textColor="@color/libraryColorPrimary"
                         android:layout_marginTop="10sp"
                         android:text="0.00"
                         android:textSize="30sp"
@@ -178,14 +178,14 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Amount Sold"
-                        android:textColor="@color/colorGray"
+                        android:textColor="@color/libraryColorGray"
                         android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/txtAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/colorLibraryPrimary"
+                        android:textColor="@color/libraryColorPrimary"
                         android:layout_marginTop="10sp"
                         android:text="0.00"
                         android:textSize="30sp"

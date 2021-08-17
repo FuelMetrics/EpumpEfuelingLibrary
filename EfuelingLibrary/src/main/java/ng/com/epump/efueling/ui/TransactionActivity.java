@@ -101,19 +101,19 @@ public class TransactionActivity extends AppCompatActivity {
                             transState = Error.getError(errorString);
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            txtTransState.setTextColor(getColor(R.color.colorRed));
+                            txtTransState.setTextColor(getColor(R.color.libraryColorRed));
                         }
                         else{
-                            txtTransState.setTextColor(getResources().getColor(R.color.colorRed));
+                            txtTransState.setTextColor(getResources().getColor(R.color.libraryColorRed));
                         }
                         errorOccurred = true;
                     }
                     else {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            txtTransState.setTextColor(getColor(R.color.colorLibraryPrimary));
+                            txtTransState.setTextColor(getColor(R.color.libraryColorPrimary));
                         }
                         else{
-                            txtTransState.setTextColor(getResources().getColor(R.color.colorLibraryPrimary));
+                            txtTransState.setTextColor(getResources().getColor(R.color.libraryColorPrimary));
                         }
                         errorOccurred = false;
                     }

@@ -4,8 +4,8 @@
         <shape>
             <corners android:radius="7sp"/>
             <gradient
-                android:startColor="@color/gradientEnd"
-                android:endColor="@color/gradientStart"
+                android:startColor="@color/libraryGradientEnd"
+                android:endColor="@color/libraryGradientStart"
                 android:type="linear"/>
         </shape>
     </item>
@@ -15,8 +15,8 @@
         <shape>
             <corners android:radius="7sp"/>
             <gradient
-                android:startColor="@color/gradientMid"
-                android:endColor="@color/gradientStart"
+                android:startColor="@color/libraryGradientMid"
+                android:endColor="@color/libraryGradientStart"
                 android:type="linear"/>
         </shape>
     </item>
