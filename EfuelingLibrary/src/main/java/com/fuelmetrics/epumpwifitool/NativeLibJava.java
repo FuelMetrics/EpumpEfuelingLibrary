@@ -30,7 +30,7 @@ public class NativeLibJava {
      * See the ep_interface.h file for
      * each API description
      * ------------------------- */
-    public native int ep_init(String did, String dc);
+    public native int ep_init(String did, String dk);
     public native int ep_run();
     public native void ep_ms_timer();
     public native int ep_start_trans(String pname, int transTy, String uid, byte val_ty, float value, int time_int, String term_id);

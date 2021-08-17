@@ -15,10 +15,8 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
@@ -30,7 +28,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Calendar;
-import java.util.Date;
 
 import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.interfaces.JNICallbackInterface;
@@ -54,6 +51,8 @@ public class EfuelingConnect implements JNICallbackInterface {
     private int wifiAvailability = 1;
     private boolean disposed;
     private Activity activity;
+    private String mDailyKey;
+    private String mTerminalId = "2101LH95";
 
     private EfuelingConnect(Context context){
         this.mContext = context;
@@ -69,7 +68,11 @@ public class EfuelingConnect implements JNICallbackInterface {
         return _connect;
     }
 
-    public void init(){
+    public void init(String dailyKey, String... terminalId){
+        mDailyKey = dailyKey;
+        if (terminalId.length > 0 && !terminalId[0].isEmpty()){
+            mTerminalId = terminalId[0];
+        }
         if (disposed){
             disposed = false;
         }
@@ -99,11 +102,13 @@ public class EfuelingConnect implements JNICallbackInterface {
             @Override
             public void run() {
                 wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
-                    ((Activity)mContext).startActivityForResult(panelIntent, 223);
-                } else {
-                    wifiManager.setWifiEnabled(state);
+                if (wifiManager.isWifiEnabled() != state) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
+                        ((Activity)mContext).startActivityForResult(panelIntent, 223);
+                    } else {
+                        wifiManager.setWifiEnabled(state);
+                    }
                 }
             }
         }).start();
@@ -144,7 +149,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     wifiAvailability = 0;
                     connectivityManager.bindProcessToNetwork(network);
                     nativeLibJava.registerCallbacks();
-                    int res = nativeLibJava.ep_init("", "");
+                    int res = nativeLibJava.ep_init("", mDailyKey);
                     if (res == 0){
                         data_interface.initComplete(true);
                         /*runOnUiThread(new Runnable() {
@@ -268,7 +273,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                                         e.printStackTrace();
                                     }
                                 }
-                                Log.i("TAG from server", "run: " + st);
                             }
                         });
                     } while (socket != null && socket.isConnected());
@@ -286,7 +290,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
 
     public int startTransaction(final TransactionType transactionType, final String pumpName,
-                                final String tag, final float amount) {
+                                final String tag, final double amount) {
         if (wifiAvailability == 0) {
             new Thread(new Runnable() {
                 @Override
@@ -299,9 +303,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                     int ss = Calendar.getInstance().get(Calendar.SECOND);
                     yy = yy - 2000;
                     int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
-                    Log.i("TAG", "startTransaction: time - " + time);
 
-                    nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), amount, time, "2101LH95");
+                    nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), (float) amount, time, mTerminalId);
                 }
             }).start();
 

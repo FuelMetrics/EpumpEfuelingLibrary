@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements IData {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
                 if (state){
-                    efuelingConnect.init();
+                    efuelingConnect.init("");
                 }
                 efuelingConnect.turnWifi(state);
                 connectBtn.setEnabled(state);
@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements IData {
                 }
                 else{
                     String tag = txtTag.getText().toString();
-                    float amount = 10;
+                    double amount = 10;
                     if (!tag.isEmpty()){
                         RandomGenerator rdg = new RandomGenerator(8, new SecureRandom());
                         String uniqueTg = rdg.nextString();
