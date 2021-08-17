@@ -271,7 +271,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                                 Log.i("TAG from server", "run: " + st);
                             }
                         });
-                    } while (socket.isConnected());
+                    } while (socket != null && socket.isConnected());
 
                     /*output.close();
                     out.close();

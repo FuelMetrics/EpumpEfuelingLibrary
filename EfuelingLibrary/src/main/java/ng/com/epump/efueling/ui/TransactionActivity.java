@@ -92,8 +92,14 @@ public class TransactionActivity extends AppCompatActivity {
                     Log.i("TAG", "run: volume " + volume);
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
-                    if (pumpState == 8 || transactionState == 8) {
-                        transState = Error.getError(errorString);
+                    if (pumpState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_ERROR ||
+                            transactionState == TransactionState.ST_PUMP_BUSY) {
+                        if (transactionState == TransactionState.ST_PUMP_BUSY){
+                            transState = pState;
+                        }
+                        else {
+                            transState = Error.getError(errorString);
+                        }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             txtTransState.setTextColor(getColor(R.color.colorRed));
                         }
@@ -110,6 +116,11 @@ public class TransactionActivity extends AppCompatActivity {
                             txtTransState.setTextColor(getResources().getColor(R.color.colorLibraryPrimary));
                         }
                         errorOccurred = false;
+                    }
+
+                    if (transactionState == TransactionState.ST_PUMP_AUTH &&
+                            (pumpState == PumpState.NOZZLE_HANG_UP || pumpState == PumpState.PUMP_AUTH_NOZZLE_HANG_UP)){
+                        transState = PumpState.getString(pumpState);
                     }
                     txtTransState.setText(transState);
 

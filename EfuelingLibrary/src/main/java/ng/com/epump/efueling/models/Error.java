@@ -21,6 +21,9 @@ public class Error {
             else if (errorCode == GoErrorType.EVT_SOCKET_ERROR.ordinal()){
                 errorString = "Network Error";
             }
+            else {
+                errorString = "Unknown Error- " + error;
+            }
         }
         else if (errorType.equalsIgnoreCase(ErrorType.L.name())){
             errorString = "Library - " + LibraryErrorType.getString(errorCode);
