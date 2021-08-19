@@ -1,9 +1,11 @@
 package ng.com.epump.efueling;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -17,6 +19,8 @@ import android.os.Handler;
 import android.provider.Settings;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
@@ -105,7 +109,7 @@ public class EfuelingConnect implements JNICallbackInterface {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                wifiManager = (WifiManager) mContext.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                 if (wifiManager.isWifiEnabled() != state) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
@@ -119,7 +123,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
 
     public void connect2WifiAndSocket(String ssid, String password, final String ipAddress){
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
             try {
                 WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = "\"" + ssid + "\"";
@@ -131,87 +135,38 @@ public class EfuelingConnect implements JNICallbackInterface {
                 /*if (isWifiConnected("\"" + deviceId + "\"")) {
                     doSomethingHere()
                 }*/
+
+                handleConnect(ipAddress);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        } else {
-            WifiNetworkSpecifier wifiNetworkSpecifier = new WifiNetworkSpecifier.Builder()
-                    .setSsid(ssid)
-                    .setWpa2Passphrase(password)
-                    .build();
+        }
+        else {
+            NetworkRequest networkRequest;
 
-            NetworkRequest networkRequest = new NetworkRequest.Builder()
-                    .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
-                    .setNetworkSpecifier(wifiNetworkSpecifier)
-                    .build();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                WifiNetworkSpecifier wifiNetworkSpecifier = new WifiNetworkSpecifier.Builder()
+                        .setSsid(ssid)
+                        .setWpa2Passphrase(password)
+                        .build();
 
+                networkRequest = new NetworkRequest.Builder()
+                        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+                        .setNetworkSpecifier(wifiNetworkSpecifier).build();
+            }
+            else {
+                networkRequest = new NetworkRequest.Builder()
+                        .addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
+            }
             final ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
             ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback(){
                 @Override
                 public void onAvailable(@NonNull Network network) {
                     super.onAvailable(network);
-                    wifiAvailability = 0;
-                    connectivityManager.bindProcessToNetwork(network);
-                    nativeLibJava.registerCallbacks();
-                    int res = nativeLibJava.ep_init("", mDailyKey);
-                    if (res == 0){
-                        data_interface.initComplete(true);
-                        /*runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                btnMessage.setEnabled(true);
-                            }
-                        });*/
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        connectivityManager.bindProcessToNetwork(network);
                     }
-                    else {
-                        data_interface.initComplete(false);
-                    }
-
-                    countDownTimer = new CountDownTimer(60000, 100) {
-                        @Override
-                        public void onTick(long l) {
-                            nativeLibJava.ep_ms_timer();
-                            //data_interface.getStates(nativeLibJava.ep_get_pump_state(), nativeLibJava.ep_get_cur_state());
-                            Intent intent = new Intent("get_States");
-                            intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
-                            intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
-                            intent.putExtra("transaction_error_string", nativeLibJava.ep_get_err_details());
-                            intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
-                            intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
-                            intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
-                            intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
-                            intent.putExtra("transaction_session_id", nativeLibJava.ep_get_session_id());
-                            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-                            /*runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-
-                                    String errorString = "";
-                                    String transState = TransactionState.getString(nativeLibJava.ep_get_cur_state());
-                                    String pumpState = PumpState.getString(nativeLibJava.ep_get_pump_state());
-                                    if (nativeLibJava.ep_get_cur_state() == 8) {
-                                        errorString = nativeLibJava.ep_get_err_details();
-                                        transState = transState + errorString;
-                                    }
-                                    txtTransState.setText(transState);
-
-                                    txtPumpState.setText(pumpState);
-                                }
-                            });*/
-                        }
-
-                        @Override
-                        public void onFinish() {
-                            start();
-                        }
-                    };
-                    countDownTimer.start();
-
-                    if (!runCalled) {
-                        new Thread(new Ep_Run(nativeLibJava)).start();
-                        runCalled = true;
-                    }
-                    socketConnection(ipAddress);
+                    handleConnect(ipAddress);
                 }
 
                 @Override
@@ -241,6 +196,49 @@ public class EfuelingConnect implements JNICallbackInterface {
             };
             connectivityManager.requestNetwork(networkRequest, networkCallback);
         }
+    }
+
+    private void handleConnect(String ipAddress){
+        wifiAvailability = 0;
+
+        nativeLibJava.registerCallbacks();
+        int res = nativeLibJava.ep_init("", mDailyKey);
+        if (res == 0){
+            data_interface.initComplete(true);
+        }
+        else {
+            data_interface.initComplete(false);
+        }
+
+        countDownTimer = new CountDownTimer(60000, 100) {
+            @Override
+            public void onTick(long l) {
+                nativeLibJava.ep_ms_timer();
+                //data_interface.getStates(nativeLibJava.ep_get_pump_state(), nativeLibJava.ep_get_cur_state());
+                Intent intent = new Intent("get_States");
+                intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
+                intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
+                intent.putExtra("transaction_error_string", nativeLibJava.ep_get_err_details());
+                intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
+                intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
+                intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
+                intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
+                intent.putExtra("transaction_session_id", nativeLibJava.ep_get_session_id());
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
+
+            @Override
+            public void onFinish() {
+                start();
+            }
+        };
+        countDownTimer.start();
+
+        if (!runCalled) {
+            new Thread(new Ep_Run(nativeLibJava)).start();
+            runCalled = true;
+        }
+        socketConnection(ipAddress);
     }
 
     private void socketConnection(final String ip){
