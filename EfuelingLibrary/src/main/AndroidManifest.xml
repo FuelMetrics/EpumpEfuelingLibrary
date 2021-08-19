@@ -10,7 +10,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-        <activity android:name=".ui.TransactionActivity"
+        <activity
+            android:hardwareAccelerated="false"
+            android:name=".ui.TransactionActivity"
             android:theme="@style/Library_Theme"/>
     </application>
 

@@ -79,7 +79,12 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (nativeLibJava != null){
             nativeLibJava.ep_end_trans();
         }
-        nativeLibJava = new NativeLibJava(this);
+        try{
+            nativeLibJava = new NativeLibJava(this);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
         data_interface = (IData) mContext;
     }
 

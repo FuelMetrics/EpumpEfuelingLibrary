@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements IData {
     }
 
     @Override
-    public void initComplete(boolean complete) {
+    public void initComplete(final boolean complete) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
