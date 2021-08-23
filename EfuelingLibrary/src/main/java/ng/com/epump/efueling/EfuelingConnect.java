@@ -59,7 +59,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private Socket socket;
     private CountDownTimer countDownTimer;
     private int wifiAvailability = 1;
-    private boolean disposed;
+    private boolean disposed, connectionStarted;
     private Activity activity;
     private String mDailyKey = "";
     private String mTerminalId = "";
@@ -175,18 +175,23 @@ public class EfuelingConnect implements JNICallbackInterface {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         connectivityManager.bindProcessToNetwork(network);
                     }
-                    handleConnect(ipAddress);
+                    if (!connectionStarted) {
+                        connectionStarted = true;
+                        handleConnect(ipAddress);
+                    }
                 }
 
                 @Override
                 public void onLosing(@NonNull Network network, int maxMsToLive) {
                     super.onLosing(network, maxMsToLive);
+                    connectionStarted = false;
                 }
 
                 @Override
                 public void onLost(@NonNull Network network) {
                     wifiAvailability = 2;
                     super.onLost(network);
+                    connectionStarted = false;
                     //nativeLibJava.ep_end_trans();
                     //data_interface.initComplete(false);
                     /*runOnUiThread(new Runnable() {
@@ -201,6 +206,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                 public void onUnavailable() {
                     wifiAvailability = 1;
                     super.onUnavailable();
+                    connectionStarted = false;
                 }
             };
             connectivityManager.requestNetwork(networkRequest, networkCallback);
@@ -244,7 +250,8 @@ public class EfuelingConnect implements JNICallbackInterface {
         countDownTimer.start();
 
         if (!runCalled) {
-            new Thread(new Ep_Run(nativeLibJava)).start();
+            epRun = new Thread(new Ep_Run(nativeLibJava));
+            epRun.start();
             runCalled = true;
         }
         socketConnection(ipAddress);
