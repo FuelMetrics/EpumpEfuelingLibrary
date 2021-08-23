@@ -341,10 +341,12 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (!disposed) {
             disposed = true;
             try{
-                thread.interrupt();
-                thread.stop();
-                epRun.interrupt();
-                epRun.stop();
+                if (thread != null) {
+                    thread.interrupt();
+                }
+                if (epRun != null) {
+                    epRun.interrupt();
+                }
             }
             catch (Exception ex){
                 ex.printStackTrace();
