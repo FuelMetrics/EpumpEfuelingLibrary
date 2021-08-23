@@ -75,6 +75,10 @@ public class TransactionActivity extends AppCompatActivity {
                         percentage = (int) ((volume / transValue) * 100);
                     }
                 }
+
+                if (transactionState == TransactionState.ST_PUMP_FILL_COMP){
+                    transComplete = true;
+                }
             }
 
             runOnUiThread(new Runnable() {
