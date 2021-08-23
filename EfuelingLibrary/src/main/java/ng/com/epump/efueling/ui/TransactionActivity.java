@@ -191,6 +191,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
+                returnData.putExtra("transactionStarted", transactionStarted);
                 returnData.putExtra("transactionDate", transactionDate);
                 if (transComplete || errorOccurred){
                     return_value = -1;
