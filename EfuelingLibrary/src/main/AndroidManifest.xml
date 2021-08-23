@@ -8,13 +8,18 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions"/>
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application>
-        <activity android:name=".ui.TransactionActivity"
-            android:theme="@style/Library_Theme"/>
+        <activity
+            android:name=".ui.NFCActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ui.TransactionActivity"
+            android:theme="@style/Library_Theme" />
     </application>
 
 </manifest>

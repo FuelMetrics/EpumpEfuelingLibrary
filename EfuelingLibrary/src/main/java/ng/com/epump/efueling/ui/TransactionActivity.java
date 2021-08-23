@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Date;
+
 import ng.com.epump.efueling.R;
 import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
@@ -39,6 +41,7 @@ public class TransactionActivity extends AppCompatActivity {
     private int percentage = 0;
     private int return_value;
     private boolean transComplete, errorOccurred, transactionStarted;
+    private long transactionDate;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -156,6 +159,9 @@ public class TransactionActivity extends AppCompatActivity {
         txtValueType = findViewById(R.id.txtValueType);
         btnEndTrans = findViewById(R.id.btnEndTrans);
         imgDismiss = findViewById(R.id.imgDismiss);
+        if (getIntent() != null){
+            transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
+        }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +172,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
                 returnData.putExtra("transactionStarted", transactionStarted);
+                returnData.putExtra("transactionDate", transactionDate);
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();
@@ -180,6 +187,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
+                returnData.putExtra("transactionDate", transactionDate);
                 if (transComplete || errorOccurred){
                     return_value = -1;
                 }

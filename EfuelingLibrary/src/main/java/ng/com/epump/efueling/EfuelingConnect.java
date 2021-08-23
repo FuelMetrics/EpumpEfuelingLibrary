@@ -3,6 +3,7 @@ package ng.com.epump.efueling;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -17,6 +18,7 @@ import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.provider.Settings;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -32,6 +34,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Calendar;
+import java.util.Date;
 
 import ng.com.epump.efueling.interfaces.IData;
 import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
@@ -41,6 +44,8 @@ import ng.com.epump.efueling.models.ValueType;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
 public class EfuelingConnect implements JNICallbackInterface {
+    private static final int GA_NFC_REQUEST_CODE = 0011;
+    private static final int EP_NFC_REQUEST_CODE = 0012;
     public static final int TRANSACTION_START = 213;
     public NativeLibJava nativeLibJava;
     @SuppressLint("StaticFieldLeak")
@@ -57,6 +62,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private Activity activity;
     private String mDailyKey = "";
     private String mTerminalId = "";
+    private Date transactionDate;
 
     private EfuelingConnect(Context context){
         this.mContext = context;
@@ -298,12 +304,14 @@ public class EfuelingConnect implements JNICallbackInterface {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int yy = Calendar.getInstance().get(Calendar.YEAR);
-                    int mon = Calendar.getInstance().get(Calendar.MONTH);
-                    int dd = Calendar.getInstance().get(Calendar.DATE);
-                    int hh = Calendar.getInstance().get(Calendar.HOUR);
-                    int mm = Calendar.getInstance().get(Calendar.MINUTE);
-                    int ss = Calendar.getInstance().get(Calendar.SECOND);
+                    Calendar calendar = Calendar.getInstance();
+                    transactionDate = calendar.getTime();
+                    int yy = calendar.get(Calendar.YEAR);
+                    int mon = calendar.get(Calendar.MONTH);
+                    int dd = calendar.get(Calendar.DATE);
+                    int hh = calendar.get(Calendar.HOUR);
+                    int mm = calendar.get(Calendar.MINUTE);
+                    int ss = calendar.get(Calendar.SECOND);
                     yy = yy - 2000;
                     int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
 
@@ -312,6 +320,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             }).start();
 
             Intent intent = new Intent(mContext, TransactionActivity.class);
+            intent.putExtra("Transaction_Date", transactionDate.getTime());
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
         }
         return wifiAvailability;
@@ -351,6 +360,26 @@ public class EfuelingConnect implements JNICallbackInterface {
     public void stopTransaction(){
         if (nativeLibJava != null){
             nativeLibJava.ep_end_trans();
+        }
+    }
+
+    public void readNFC() {
+        Intent intent = new Intent("ng.com.epump.efueling.ui.NFCActivity");
+        intent.setFlags(0);
+        try {
+            activity.startActivityForResult(intent, EP_NFC_REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, "Activity Not Found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void readGANFC() {
+        Intent intent = new Intent("com.globalaccelerex.read_nfc");
+        intent.setFlags(0);
+        try {
+            activity.startActivityForResult(intent, GA_NFC_REQUEST_CODE);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(mContext, "Activity Not Found", Toast.LENGTH_LONG).show();
         }
     }
 }
