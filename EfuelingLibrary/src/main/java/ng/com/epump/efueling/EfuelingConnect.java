@@ -89,9 +89,9 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (disposed){
             disposed = false;
         }
-        if (nativeLibJava != null){
+        /*if (nativeLibJava != null){
             nativeLibJava.ep_end_trans();
-        }
+        }*/
         nativeLibJava = new NativeLibJava(this);
         data_interface = (IData) mContext;
     }
@@ -192,14 +192,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                     wifiAvailability = 2;
                     super.onLost(network);
                     connectionStarted = false;
-                    //nativeLibJava.ep_end_trans();
-                    //data_interface.initComplete(false);
-                    /*runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            btnMessage.setEnabled(false);
-                        }
-                    });*/
                 }
 
                 @Override
@@ -283,14 +275,14 @@ public class EfuelingConnect implements JNICallbackInterface {
                                 if (st != null) {
                                     nativeLibJava.ep_rx_data(st, st.length());
                                 } else {
-                                    try {
+                                    /*try {
                                         output.close();
                                         input.close();
                                         socket.close();
 
                                     } catch (IOException e) {
                                         e.printStackTrace();
-                                    }
+                                    }*/
                                 }
                             }
                         });
@@ -307,7 +299,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                 }
             }
         });
-
         thread.start();
     }
 
@@ -364,7 +355,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
             if (nativeLibJava != null){
                 nativeLibJava.ep_end_trans();
-                nativeLibJava.ep_deinit();
+                //nativeLibJava.ep_deinit();
             }
 
             try {
