@@ -65,6 +65,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private String mTerminalId = "";
     private Date transactionDate;
     private int connectionTrial = 0;
+    private Thread thread, epRun;
 
     private EfuelingConnect(Context context){
         this.mContext = context;
@@ -251,7 +252,7 @@ public class EfuelingConnect implements JNICallbackInterface {
 
     private void socketConnection(final String ip){
         final Handler handler = new Handler(Looper.getMainLooper());
-        final Thread thread = new Thread(new Runnable() {
+        thread = new Thread(new Runnable() {
             @Override
             public void run() {
 
@@ -265,8 +266,6 @@ public class EfuelingConnect implements JNICallbackInterface {
 
                     output = new PrintWriter(out);
 
-                    /*output.println(msg[0]);
-                    output.flush();*/
                     final BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     do {
                         final String st = input.readLine();
@@ -291,9 +290,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                     } while (socket != null && socket.isConnected() && !socket.isClosed());
 
                     if (socket != null && socket.isClosed()) {
-                        output.close();
-                        input.close();
-
                         if (!disposed && connectionTrial < 5){
                             connectionTrial++;
                             socketConnection(ip);
@@ -344,6 +340,15 @@ public class EfuelingConnect implements JNICallbackInterface {
     public void dispose() {
         if (!disposed) {
             disposed = true;
+            try{
+                thread.interrupt();
+                thread.stop();
+                epRun.interrupt();
+                epRun.stop();
+            }
+            catch (Exception ex){
+                ex.printStackTrace();
+            }
             if (countDownTimer != null) {
                 countDownTimer.cancel();
                 countDownTimer = null;
