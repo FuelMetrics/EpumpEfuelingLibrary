@@ -134,7 +134,7 @@ public class NFCActivity extends AppCompatActivity {
 
     private void enableNfcForegroundDispatch() {
         try {
-            Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
             mNfcAdapter.enableForegroundDispatch(this, nfcPendingIntent, filters, techList);
         } catch (IllegalStateException ex) {
