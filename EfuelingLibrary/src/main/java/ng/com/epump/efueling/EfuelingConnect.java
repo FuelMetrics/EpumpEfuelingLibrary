@@ -17,6 +17,7 @@ import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Toast;
 
@@ -249,8 +250,8 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
 
     private void socketConnection(final String ip){
-        final Handler handler = new Handler();
-        Thread thread = new Thread(new Runnable() {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        final Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
 
