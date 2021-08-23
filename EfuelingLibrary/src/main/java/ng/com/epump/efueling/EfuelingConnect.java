@@ -63,6 +63,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private String mDailyKey = "";
     private String mTerminalId = "";
     private Date transactionDate;
+    private int connectionTrial = 0;
 
     private EfuelingConnect(Context context){
         this.mContext = context;
@@ -257,6 +258,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     //Replace below IP with the IP of that device in which server socket open.
                     //If you change port then change the port number in the server side code also.
                     socket = new Socket(ip, 5555);
+                    socket.setKeepAlive(true);
 
                     OutputStream out = socket.getOutputStream();
 
@@ -278,17 +280,24 @@ public class EfuelingConnect implements JNICallbackInterface {
                                         output.close();
                                         input.close();
                                         socket.close();
+
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 }
                             }
                         });
-                    } while (socket != null && socket.isConnected());
+                    } while (socket != null && socket.isConnected() && !socket.isClosed());
 
-                    /*output.close();
-                    out.close();
-                    s.close();*/
+                    if (socket != null && socket.isClosed()) {
+                        output.close();
+                        input.close();
+
+                        if (!disposed && connectionTrial < 5){
+                            connectionTrial++;
+                            socketConnection(ip);
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -344,8 +353,10 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
 
             try {
-                socket.close();
-                output.close();
+                if (socket != null && !socket.isClosed()) {
+                    socket.close();
+                    output.close();
+                }
 
                 socket = null;
                 output = null;
