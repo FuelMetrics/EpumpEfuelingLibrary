@@ -55,8 +55,8 @@ public class EfuelingConnect implements JNICallbackInterface {
     private int wifiAvailability = 1;
     private boolean disposed;
     private Activity activity;
-    private String mDailyKey;
-    private String mTerminalId;
+    private String mDailyKey = "";
+    private String mTerminalId = "";
 
     private EfuelingConnect(Context context){
         this.mContext = context;

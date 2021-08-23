@@ -94,8 +94,8 @@ public class TransactionActivity extends AppCompatActivity {
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
                     if (pumpState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_ERROR ||
-                            transactionState == TransactionState.ST_PUMP_BUSY) {
-                        if (transactionState == TransactionState.ST_PUMP_BUSY){
+                            transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
+                        if (transactionState == TransactionState.ST_PUMP_BUSY || transactionState == TransactionState.ST_IDLE){
                             transState = pState;
                         }
                         else {
