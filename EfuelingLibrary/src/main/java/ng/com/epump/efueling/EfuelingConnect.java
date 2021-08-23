@@ -301,11 +301,11 @@ public class EfuelingConnect implements JNICallbackInterface {
     public int startTransaction(final TransactionType transactionType, final String pumpName,
                                 final String tag, final double amount) {
         if (wifiAvailability == 0) {
+            final Calendar calendar = Calendar.getInstance();
+            transactionDate = calendar.getTime();
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    Calendar calendar = Calendar.getInstance();
-                    transactionDate = calendar.getTime();
                     int yy = calendar.get(Calendar.YEAR);
                     int mon = calendar.get(Calendar.MONTH);
                     int dd = calendar.get(Calendar.DATE);
