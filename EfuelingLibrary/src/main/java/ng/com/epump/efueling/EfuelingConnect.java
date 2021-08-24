@@ -42,6 +42,7 @@ import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.ValueType;
+import ng.com.epump.efueling.ui.NFCActivity;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
 public class EfuelingConnect implements JNICallbackInterface {
@@ -381,7 +382,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
 
     public void readNFC() {
-        Intent intent = new Intent("ng.com.epump.efueling.ui.NFCActivity");
+        Intent intent = new Intent(activity, NFCActivity.class);
         intent.setFlags(0);
         try {
             activity.startActivityForResult(intent, EP_NFC_REQUEST_CODE);
