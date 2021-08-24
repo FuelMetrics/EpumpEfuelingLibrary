@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import java.util.Date;
+
 import ng.com.epump.efueling.R;
 import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
@@ -39,6 +41,7 @@ public class TransactionActivity extends AppCompatActivity {
     private int percentage = 0;
     private int return_value;
     private boolean transComplete, errorOccurred, transactionStarted;
+    private long transactionDate;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -72,6 +75,10 @@ public class TransactionActivity extends AppCompatActivity {
                         percentage = (int) ((volume / transValue) * 100);
                     }
                 }
+
+                if (transactionState == TransactionState.ST_PUMP_FILL_COMP){
+                    transComplete = true;
+                }
             }
 
             runOnUiThread(new Runnable() {
@@ -94,8 +101,8 @@ public class TransactionActivity extends AppCompatActivity {
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
                     if (pumpState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_ERROR ||
-                            transactionState == TransactionState.ST_PUMP_BUSY) {
-                        if (transactionState == TransactionState.ST_PUMP_BUSY){
+                            transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
+                        if (transactionState == TransactionState.ST_PUMP_BUSY || transactionState == TransactionState.ST_IDLE){
                             transState = pState;
                         }
                         else {
@@ -156,6 +163,9 @@ public class TransactionActivity extends AppCompatActivity {
         txtValueType = findViewById(R.id.txtValueType);
         btnEndTrans = findViewById(R.id.btnEndTrans);
         imgDismiss = findViewById(R.id.imgDismiss);
+        if (getIntent() != null){
+            transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
+        }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -166,6 +176,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
                 returnData.putExtra("transactionStarted", transactionStarted);
+                returnData.putExtra("transactionDate", transactionDate);
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();
@@ -180,6 +191,8 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
                 returnData.putExtra("transactionValue", transValue);
+                returnData.putExtra("transactionStarted", transactionStarted);
+                returnData.putExtra("transactionDate", transactionDate);
                 if (transComplete || errorOccurred){
                     return_value = -1;
                 }

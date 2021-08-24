@@ -21,4 +21,18 @@ public class Utility {
         }
         return pass.toString();
     }
+
+    public static String bytesToHexString(byte[] source){
+        StringBuilder stringBuilder = new StringBuilder("");
+        if (source == null || source.length <= 0){
+            return  null;
+        }
+        char[] buffer = new char[2];
+        for (byte src : source) {
+            buffer[0] = Character.forDigit((src >>> 4) & 0x0F, 16);
+            buffer[1] = Character.forDigit((src) & 0x0F, 16);
+            stringBuilder.append(buffer);
+        }
+        return stringBuilder.toString();
+    }
 }
