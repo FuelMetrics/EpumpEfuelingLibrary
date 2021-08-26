@@ -143,8 +143,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                         if (list != null){
                             for (WifiConfiguration i : list) {
                                 wifiManager.removeNetwork(i.networkId);
+                                wifiManager.saveConfiguration();
                             }
-                            wifiManager.saveConfiguration();
                         }
                     }
                 }
