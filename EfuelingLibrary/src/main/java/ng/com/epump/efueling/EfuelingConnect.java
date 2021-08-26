@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
@@ -37,6 +36,9 @@ import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import ng.com.epump.efueling.interfaces.IData;
 
@@ -69,7 +71,9 @@ public class EfuelingConnect implements JNICallbackInterface {
     private String mTerminalId = "";
     private Date transactionDate;
     private int connectionTrial = 0;
-    private Thread thread, epRun;
+    //private Thread thread, epRun;
+    private ExecutorService executor;
+    private Future epRunFuture, socketFuture;
 
     private EfuelingConnect(Context context) {
         this.mContext = context;
@@ -266,8 +270,10 @@ public class EfuelingConnect implements JNICallbackInterface {
         countDownTimer.start();
 
         if (!runCalled) {
-            epRun = new Thread(new Ep_Run(nativeLibJava));
-            epRun.start();
+            executor = Executors.newSingleThreadExecutor();
+            epRunFuture =  executor.submit(new Ep_Run(nativeLibJava));
+            /*epRun = new Thread();
+            epRun.start();*/
             runCalled = true;
         }
         socketConnection(ipAddress);
@@ -275,7 +281,7 @@ public class EfuelingConnect implements JNICallbackInterface {
 
     private void socketConnection(final String ip){
         final Handler handler = new Handler(Looper.getMainLooper());
-        thread = new Thread(new Runnable() {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
 
@@ -322,8 +328,10 @@ public class EfuelingConnect implements JNICallbackInterface {
                     e.printStackTrace();
                 }
             }
-        });
-        thread.start();
+        };
+        socketFuture = executor.submit(runnable);
+        /*thread = new Thread();
+        thread.start();*/
     }
 
     public int startTransaction(final TransactionType transactionType, final String pumpName,
@@ -363,11 +371,20 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (!disposed) {
             disposed = true;
             try{
-                if (thread != null) {
+                /*if (thread != null) {
                     thread.interrupt();
                 }
                 if (epRun != null) {
                     epRun.interrupt();
+                }*/
+                if (socketFuture != null && !socketFuture.isCancelled()){
+                    socketFuture.cancel(true);
+                }
+                if (epRunFuture != null && !epRunFuture.isCancelled()){
+                    epRunFuture.cancel(true);
+                }
+                if(executor != null && !executor.isShutdown()){
+                    executor.shutdownNow();
                 }
             }
             catch (Exception ex){
@@ -379,7 +396,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
             if (nativeLibJava != null){
                 nativeLibJava.ep_end_trans();
-                //nativeLibJava.ep_deinit();
+                nativeLibJava.ep_deinit();
             }
 
             try {

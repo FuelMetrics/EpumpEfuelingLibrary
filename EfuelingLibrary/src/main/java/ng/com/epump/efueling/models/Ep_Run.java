@@ -1,5 +1,7 @@
 package ng.com.epump.efueling.models;
 
+import android.util.Log;
+
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
 
 public class Ep_Run implements Runnable {
@@ -9,6 +11,8 @@ public class Ep_Run implements Runnable {
     }
     @Override
     public void run() {
+        Log.i("Ep run", "run: task started");
         _nativeLibJava.ep_run();
+        Log.i("Ep run", "run: task exited");
     }
 }
