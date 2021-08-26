@@ -271,7 +271,9 @@ public class EfuelingConnect implements JNICallbackInterface {
         countDownTimer.start();
 
         if (!runCalled) {
-            executor = Executors.newSingleThreadExecutor();
+            if (executor == null || executor.isShutdown()){
+                executor = Executors.newSingleThreadExecutor();
+            }
             epRunFuture =  executor.submit(new Ep_Run(nativeLibJava));
             /*epRun = new Thread();
             epRun.start();*/
@@ -330,6 +332,9 @@ public class EfuelingConnect implements JNICallbackInterface {
                 }
             }
         };
+        if (executor == null || executor.isShutdown()){
+            executor = Executors.newSingleThreadExecutor();
+        }
         socketFuture = executor.submit(runnable);
         /*thread = new Thread();
         thread.start();*/
@@ -387,6 +392,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                 if(executor != null && !executor.isShutdown()){
                     executor.shutdownNow();
                 }
+                executor = null;
+                runCalled = false;
             }
             catch (Exception ex){
                 ex.printStackTrace();
