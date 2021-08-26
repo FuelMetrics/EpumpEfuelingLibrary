@@ -22,12 +22,12 @@ public class Error {
                 errorString = "Network Error";
             }
             else {
-                errorString = "Unknown Error- " + error;
+                errorString = "Unknown Error";
             }
         }
         else if (errorType.equalsIgnoreCase(ErrorType.L.name())){
             errorString = "Library - " + LibraryErrorType.getString(errorCode);
         }
-        return errorString;
+        return errorString + " - " + error;
     }
 }
