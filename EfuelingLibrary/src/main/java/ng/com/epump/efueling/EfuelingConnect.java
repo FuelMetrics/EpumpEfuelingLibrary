@@ -60,7 +60,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private Context mContext;
     private IData data_interface;
     private WifiManager wifiManager;
-    private boolean runCalled;
+    private static boolean runCalled;
     private PrintWriter output;
     private Socket socket;
     private CountDownTimer countDownTimer;
@@ -271,13 +271,13 @@ public class EfuelingConnect implements JNICallbackInterface {
         countDownTimer.start();
 
         if (!runCalled) {
+            runCalled = true;
             if (executor == null || executor.isShutdown()){
                 executor = Executors.newSingleThreadExecutor();
             }
             epRunFuture =  executor.submit(new Ep_Run(nativeLibJava));
             /*epRun = new Thread();
             epRun.start();*/
-            runCalled = true;
         }
         socketConnection(ipAddress);
     }
@@ -383,6 +383,16 @@ public class EfuelingConnect implements JNICallbackInterface {
                 if (epRun != null) {
                     epRun.interrupt();
                 }*/
+
+                if (countDownTimer != null) {
+                    countDownTimer.cancel();
+                    countDownTimer = null;
+                }
+                if (nativeLibJava != null){
+                    nativeLibJava.ep_end_trans();
+                    nativeLibJava.ep_deinit();
+                }
+
                 if (socketFuture != null && !socketFuture.isCancelled()){
                     socketFuture.cancel(true);
                 }
@@ -397,14 +407,6 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
             catch (Exception ex){
                 ex.printStackTrace();
-            }
-            if (countDownTimer != null) {
-                countDownTimer.cancel();
-                countDownTimer = null;
-            }
-            if (nativeLibJava != null){
-                nativeLibJava.ep_end_trans();
-                nativeLibJava.ep_deinit();
             }
 
             try {
