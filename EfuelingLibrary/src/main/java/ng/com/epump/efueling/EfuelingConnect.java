@@ -36,9 +36,12 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import ng.com.epump.efueling.interfaces.IData;
+
 import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
+
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.ValueType;
@@ -68,26 +71,26 @@ public class EfuelingConnect implements JNICallbackInterface {
     private int connectionTrial = 0;
     private Thread thread, epRun;
 
-    private EfuelingConnect(Context context){
+    private EfuelingConnect(Context context) {
         this.mContext = context;
-        if (context instanceof Activity){
+        if (context instanceof Activity) {
             this.activity = (Activity) context;
         }
     }
 
-    public static EfuelingConnect getInstance(Context context){
-        if (_connect == null){
+    public static EfuelingConnect getInstance(Context context) {
+        if (_connect == null) {
             _connect = new EfuelingConnect(context);
         }
         return _connect;
     }
 
-    public void init(String dailyKey, String terminalId){
+    public void init(String dailyKey, String terminalId) {
         mDailyKey = dailyKey;
-        if (!terminalId.isEmpty()){
+        if (!terminalId.isEmpty()) {
             mTerminalId = terminalId;
         }
-        if (disposed){
+        if (disposed) {
             disposed = false;
         }
         /*if (nativeLibJava != null){
@@ -97,13 +100,13 @@ public class EfuelingConnect implements JNICallbackInterface {
         data_interface = (IData) mContext;
     }
 
-    public void init(String dailyKey){
+    public void init(String dailyKey) {
         init(dailyKey, "");
     }
 
     @Override
     public void tx_data(String data, int len) {
-        if (output != null){
+        if (output != null) {
             output.println(data);
             output.flush();
         }
@@ -115,11 +118,29 @@ public class EfuelingConnect implements JNICallbackInterface {
         data_interface.tx_data(data, len);*/
     }
 
-    public void turnWifi(final boolean state){
+    public void turnWifi(final boolean state) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+                if (!state) {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    else {
+                        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+                        for (WifiConfiguration i : list) {
+                            wifiManager.removeNetwork(i.networkId);
+                        }
+                    }
+                }
                 if (wifiManager.isWifiEnabled() != state) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
