@@ -19,38 +19,55 @@ public class PumpState {
     public static final int PUMP_STATUS_UNKNOWN = 255;
 
     public static String getString(int state) {
+        String resp = "";
         switch (state) {
             case PUMP_NOT_ACTIVE:
-                return "Pump is not active";
+                resp = "Pump is not active";
+                break;
             case PUMP_NOT_LOCKED:
-                return "Pump is not locked";
+                resp = "Pump is not locked";
+                break;
             case NOZZLE_HANG_DOWN:
-                return "Nozzle down";
+                resp = "Nozzle down";
+                break;
             case NOZZLE_HANG_UP:
-                return "Nozzle up";
+                resp = "Nozzle up";
+                break;
             case PUMP_AUTH_NOZZLE_HANG_DOWN:
-                return "Pump authorized, nozzle down";
+                resp = "Pump authorized, nozzle down";
+                break;
             case PUMP_AUTH_NOZZLE_HANG_UP:
-                return "Pump authorized, nozzle up";
+                resp = "Pump authorized, nozzle up";
+                break;
             case PUMP_FILLING:
-                return "Pump currently selling";
+                resp = "Pump currently selling";
+                break;
             case PUMP_FILLED_LIMIT:
-                return "Pump finished selling";
+                resp = "Pump finished selling";
+                break;
             case PUMP_FILL_COMP_NOZZLE_HANG_DOWN:
-                return "Pump finished selling, nozzle down";
+                resp = "Pump finished selling, nozzle down";
+                break;
             case PUMP_FILL_COMP_NOZZLE_HANG_UP:
-                return "Pump finished selling, nozzle up";
+                resp = "Pump finished selling, nozzle up";
+                break;
             case PUMP_SWITCHED_OFF:
-                return "Pump is switched off";
+                resp = "Pump is switched off";
+                break;
             case PUMP_STATUS_OTHERS:
-                return "Pump status unknown";
+                resp = "Pump status unknown";
+                break;
             case PUMP_ERROR:
-                return "Pump error";
+                resp = "Pump error";
+                break;
             case PUMP_STATUS_UNKNOWN:
-                return "Pump offline";
+                resp = "Pump offline";
+                break;
             default:
+                resp = "-" + state;
                 break;
         }
-        return "";
+
+        return resp;
     }
 }

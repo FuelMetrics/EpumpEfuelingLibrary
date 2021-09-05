@@ -11,6 +11,7 @@ import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
+import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
@@ -19,6 +20,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -33,6 +35,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -40,6 +44,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import io.socket.client.IO;
+import io.socket.emitter.Emitter;
 import ng.com.epump.efueling.interfaces.IData;
 
 import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
@@ -71,7 +77,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private String mTerminalId = "";
     private Date transactionDate;
     private int connectionTrial = 0;
-    //private Thread thread, epRun;
+    private Thread thread, epRun;
     private ExecutorService executor;
     private Future epRunFuture, socketFuture;
 
@@ -83,10 +89,11 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
 
     public static EfuelingConnect getInstance(Context context) {
-        if (_connect == null) {
+        /*if (_connect == null) {
             _connect = new EfuelingConnect(context);
         }
-        return _connect;
+        return _connect;*/
+        return new EfuelingConnect(context);
     }
 
     public void init(String dailyKey, String terminalId) {
@@ -142,8 +149,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
                         if (list != null){
                             for (WifiConfiguration i : list) {
+                                wifiManager.disableNetwork(i.networkId);
                                 wifiManager.removeNetwork(i.networkId);
-                                wifiManager.saveConfiguration();
                             }
                         }
                     }
@@ -160,7 +167,16 @@ public class EfuelingConnect implements JNICallbackInterface {
         }).start();
     }
 
+    public boolean wifiEnabled(){
+        wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        return wifiManager.isWifiEnabled();
+    }
+
     public void connect2WifiAndSocket(String ssid, String password, final String ipAddress){
+        do{
+            Log.i("TAG", "run: switching wifi on");
+        }
+        while (!wifiEnabled());
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
             try {
                 WifiConfiguration wifiConfig = new WifiConfiguration();
@@ -193,6 +209,13 @@ public class EfuelingConnect implements JNICallbackInterface {
                         .setNetworkSpecifier(wifiNetworkSpecifier).build();
             }
             else {
+                WifiConfiguration wifiConfig = new WifiConfiguration();
+                wifiConfig.SSID = "\"" + ssid + "\"";
+                wifiConfig.preSharedKey = "\"" + password + "\"";
+                int netId = wifiManager.addNetwork(wifiConfig);
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(netId, true);
+                wifiManager.reconnect();
                 networkRequest = new NetworkRequest.Builder()
                         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
             }
@@ -221,6 +244,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     wifiAvailability = 2;
                     super.onLost(network);
                     connectionStarted = false;
+                    data_interface.initComplete(false);
                 }
 
                 @Override
@@ -238,13 +262,7 @@ public class EfuelingConnect implements JNICallbackInterface {
         wifiAvailability = 0;
 
         nativeLibJava.registerCallbacks();
-        int res = nativeLibJava.ep_init("", mDailyKey);
-        if (res == 0){
-            data_interface.initComplete(true);
-        }
-        else {
-            data_interface.initComplete(false);
-        }
+        nativeLibJava.ep_init("", mDailyKey);
 
         countDownTimer = new CountDownTimer(60000, 100) {
             @Override
@@ -260,7 +278,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                 intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
                 intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
                 intent.putExtra("transaction_session_id", nativeLibJava.ep_get_session_id());
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                //LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
             }
 
             @Override
@@ -272,12 +291,12 @@ public class EfuelingConnect implements JNICallbackInterface {
 
         if (!runCalled) {
             runCalled = true;
-            if (executor == null || executor.isShutdown()){
+            /*if (executor == null || executor.isShutdown()){
                 executor = Executors.newSingleThreadExecutor();
             }
-            epRunFuture =  executor.submit(new Ep_Run(nativeLibJava));
-            /*epRun = new Thread();
-            epRun.start();*/
+            epRunFuture =  executor.submit(new Ep_Run(nativeLibJava));*/
+            epRun = new Thread(new Ep_Run(nativeLibJava));
+            epRun.start();
         }
         socketConnection(ipAddress);
     }
@@ -289,14 +308,18 @@ public class EfuelingConnect implements JNICallbackInterface {
             public void run() {
 
                 try {
-                    //Replace below IP with the IP of that device in which server socket open.
-                    //If you change port then change the port number in the server side code also.
                     socket = new Socket(ip, 5555);
                     socket.setKeepAlive(true);
 
                     OutputStream out = socket.getOutputStream();
 
                     output = new PrintWriter(out);
+
+                    do{
+                        Log.d("TAG", "run: connecting");
+                    }
+                    while (!socket.isBound() && !socket.isConnected());
+                    data_interface.initComplete(true);
 
                     final BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     do {
@@ -308,18 +331,18 @@ public class EfuelingConnect implements JNICallbackInterface {
                                 if (st != null) {
                                     nativeLibJava.ep_rx_data(st, st.length());
                                 } else {
-                                    /*try {
+                                    try {
                                         output.close();
                                         input.close();
                                         socket.close();
 
                                     } catch (IOException e) {
                                         e.printStackTrace();
-                                    }*/
+                                    }
                                 }
                             }
                         });
-                    } while (socket != null && socket.isConnected() && !socket.isClosed());
+                    } while (socket != null && socket.isBound() && socket.isConnected() && !socket.isClosed());
 
                     if (socket != null && socket.isClosed()) {
                         if (!disposed && connectionTrial < 5){
@@ -332,12 +355,12 @@ public class EfuelingConnect implements JNICallbackInterface {
                 }
             }
         };
-        if (executor == null || executor.isShutdown()){
+        /*if (executor == null || executor.isShutdown()){
             executor = Executors.newSingleThreadExecutor();
         }
-        socketFuture = executor.submit(runnable);
-        /*thread = new Thread();
-        thread.start();*/
+        socketFuture = executor.submit(runnable);*/
+        thread = new Thread(runnable);
+        thread.start();
     }
 
     public int startTransaction(final TransactionType transactionType, final String pumpName,
@@ -377,32 +400,32 @@ public class EfuelingConnect implements JNICallbackInterface {
         if (!disposed) {
             disposed = true;
             try{
-                /*if (thread != null) {
+                if (thread != null) {
                     thread.interrupt();
                 }
                 if (epRun != null) {
                     epRun.interrupt();
-                }*/
+                }
 
                 if (countDownTimer != null) {
                     countDownTimer.cancel();
                     countDownTimer = null;
                 }
                 if (nativeLibJava != null){
-                    nativeLibJava.ep_end_trans();
+                    //nativeLibJava.ep_end_trans();
                     nativeLibJava.ep_deinit();
                 }
 
-                if (socketFuture != null && !socketFuture.isCancelled()){
+                /*if (socketFuture != null && !socketFuture.isCancelled()){
                     socketFuture.cancel(true);
                 }
                 if (epRunFuture != null && !epRunFuture.isCancelled()){
                     epRunFuture.cancel(true);
                 }
                 if(executor != null && !executor.isShutdown()){
-                    executor.shutdownNow();
+                    executor.shutdown();
                 }
-                executor = null;
+                executor = null;*/
                 runCalled = false;
             }
             catch (Exception ex){

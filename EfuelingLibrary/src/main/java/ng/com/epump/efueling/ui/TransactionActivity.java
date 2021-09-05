@@ -100,9 +100,12 @@ public class TransactionActivity extends AppCompatActivity {
                     Log.i("TAG", "run: volume " + volume);
                     String transState = TransactionState.getString(transactionState);
                     String pState = PumpState.getString(pumpState);
-                    if (pumpState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_ERROR ||
+
+                    Log.i("TAG", "run: trans-state " + transState);
+                    Log.i("TAG", "run: pump-state " + pState);
+                    if (transactionState == TransactionState.ST_ERROR ||
                             transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
-                        if (transactionState == TransactionState.ST_PUMP_BUSY || transactionState == TransactionState.ST_IDLE){
+                        if (transactionState == TransactionState.ST_PUMP_BUSY){
                             transState = pState;
                         }
                         else {
