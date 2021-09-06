@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="30sp"
+        android:layout_margin="15sp"
         android:src="@drawable/library_ic_close"/>
 
     <ImageView
