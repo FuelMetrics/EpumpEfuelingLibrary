@@ -35,7 +35,7 @@ public class TransactionActivity extends AppCompatActivity {
     private Button btnEndTrans;
     private ImageView imgDismiss;
     private int pumpState, transactionState;
-    private String errorString = "", sessionId = "";
+    private String errorString = "", sessionId = "", pumpName = "";
     private double amount = 0, volume = 0, transValue = 0;
     private int transType;
     private int percentage = 0;
@@ -58,8 +58,7 @@ public class TransactionActivity extends AppCompatActivity {
                 volume = Double.parseDouble(Float.valueOf(intent.getFloatExtra("volume_sold", 0f)).toString());
                 transactionStarted = true;
                 if (transType == ValueType.Amount.ordinal()) {
-                    txtValueType.setText("Amount Authorized");
-                    if (amount >= transValue){
+                        if (amount >= transValue){
                         transComplete = true;
                     }
                     if (transValue > 0 && amount > 0) {
@@ -67,7 +66,6 @@ public class TransactionActivity extends AppCompatActivity {
                     }
                 }
                 else if (transType == ValueType.Volume.ordinal()) {
-                    txtValueType.setText("Volume Authorized");
                     if (volume >= transValue){
                         transComplete = true;
                     }
@@ -84,6 +82,12 @@ public class TransactionActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (transType == ValueType.Amount.ordinal()) {
+                        txtValueType.setText("Amount Authorized");
+                    }
+                    else if (transType == ValueType.Volume.ordinal()) {
+                        txtValueType.setText("Volume Authorized");
+                    }
                     if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
                         layoutTrans.setVisibility(View.VISIBLE);
                         txtAmount.setText(Utility.convert2DecimalString(amount, false));
@@ -93,16 +97,16 @@ public class TransactionActivity extends AppCompatActivity {
                     else {
                         layoutTrans.setVisibility(View.GONE);
                     }
-                    Log.i("TAG", "run: pumpState " + pumpState);
+                    /*Log.i("TAG", "run: pumpState " + pumpState);
                     Log.i("TAG", "run: transactionState " + transactionState);
                     Log.i("TAG", "run: errorString " + errorString);
                     Log.i("TAG", "run: amount " + amount);
-                    Log.i("TAG", "run: volume " + volume);
-                    String transState = TransactionState.getString(transactionState);
+                    Log.i("TAG", "run: volume " + volume);*/
+                    String transState = TransactionState.getString(transactionState, pumpName);
                     String pState = PumpState.getString(pumpState);
 
-                    Log.i("TAG", "run: trans-state " + transState);
-                    Log.i("TAG", "run: pump-state " + pState);
+                    /*Log.i("TAG", "run: trans-state " + transState);
+                    Log.i("TAG", "run: pump-state " + pState);*/
                     if (transactionState == TransactionState.ST_ERROR ||
                             transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
                         if (transactionState == TransactionState.ST_PUMP_BUSY){
@@ -168,6 +172,7 @@ public class TransactionActivity extends AppCompatActivity {
         imgDismiss = findViewById(R.id.imgDismiss);
         if (getIntent() != null){
             transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
+            pumpName = getIntent().getStringExtra("Pump_Name");
         }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {

@@ -386,6 +386,7 @@ public class EfuelingConnect implements JNICallbackInterface {
 
             Intent intent = new Intent(mContext, TransactionActivity.class);
             intent.putExtra("Transaction_Date", transactionDate.getTime());
+            intent.putExtra("Pump_Name", pumpName);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
         }
         return wifiAvailability;
