@@ -107,7 +107,7 @@ public class TransactionActivity extends AppCompatActivity {
 
                     /*Log.i("TAG", "run: trans-state " + transState);
                     Log.i("TAG", "run: pump-state " + pState);*/
-                    if (transactionState == TransactionState.ST_ERROR ||
+                    if (transactionState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_LIB_ERROR ||
                             transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
                         if (transactionState == TransactionState.ST_PUMP_BUSY){
                             transState = pState;

@@ -10,6 +10,7 @@ public class TransactionState {
     public static final int ST_PUMP_FILL_COMP = 6;
     public static final int ST_NULL = 7;
     public static final int ST_ERROR = 8;
+    public static final int ST_LIB_ERROR = 9;
 
     public static String getString(int state, String... pumpName) {
         String resp = "";
@@ -41,6 +42,9 @@ public class TransactionState {
                 break;
             case ST_ERROR:
                 resp = "Transaction error: ";
+                break;
+            case ST_LIB_ERROR:
+                resp = "Library error: ";
                 break;
             default:
                 resp = "-" + state;
