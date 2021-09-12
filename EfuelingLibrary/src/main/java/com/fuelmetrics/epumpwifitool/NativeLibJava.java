@@ -1,25 +1,19 @@
 package com.fuelmetrics.epumpwifitool;
 
+/** This java source file connects the native c++ source to java
+ * i.e. the functions are merely declared here, but are defined in
+ * the c++ source file
+ * it serves as the Header file of the "native-lib.cpp" source */
 public class NativeLibJava {
     JNICallbackInterface cbInterface;
 
     static {
-        try{
-            System.loadLibrary("native-lib");
-        }
-        catch (UnsatisfiedLinkError e){
-            System.out.println(e);
-        }
+        System.loadLibrary("native-lib");
     }
 
     public NativeLibJava(JNICallbackInterface cbi){
         this.cbInterface = cbi;
     }
-
-    /** -------------------------
-     * Configurtion on_child_event methods
-     * ------------------------- */
-    public native String passInMainCfgData(String prtcl, String prodt, String[] pnmArr, float priceArr);
 
     /** -------------------------
      * User on_child_event methods
@@ -52,12 +46,23 @@ public class NativeLibJava {
 
     public native Object ep_get_connection_data(String pumpname);
 
+    /** APIs for getting previous transaction and
+     * reading out each variable */
+    public native int ep_get_transaction(int index); //returns index read out
+    public native byte ep_read_trans_ty();
+    public native String ep_read_trans_uid();
+    public native double ep_read_trans_value();
+    public native byte ep_read_trans_value_ty();
+
     /** for registering callback */
     public native int registerCallbacks();
-
     private void ep_trans_cb_java(String data, int len){
         this.cbInterface.tx_data(data, len);
     }
 
 
+
+
+
 }
+
