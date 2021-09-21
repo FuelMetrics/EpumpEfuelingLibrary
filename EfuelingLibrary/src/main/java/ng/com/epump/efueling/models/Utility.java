@@ -3,6 +3,7 @@ package ng.com.epump.efueling.models;
 import java.security.SecureRandom;
 
 public class Utility {
+    public static boolean ConnectionStarted;
     public static String convert2DecimalString(double value, boolean groupThousands) {
         if (groupThousands) {
             return String.format("%,.2f", value);

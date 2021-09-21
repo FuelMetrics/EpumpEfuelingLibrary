@@ -49,6 +49,7 @@ import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.Transaction;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.TransactionValueType;
+import ng.com.epump.efueling.models.Utility;
 import ng.com.epump.efueling.ui.NFCActivity;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
@@ -66,9 +67,9 @@ public class EfuelingConnect implements JNICallbackInterface {
     private static boolean runCalled;
     private PrintWriter output;
     private Socket socket;
-    private CountDownTimer countDownTimer;
+    private CountDownTimer countDownTimer, messageCountDownTimer;
     private int wifiAvailability = 1;
-    private boolean disposed, connectionStarted;
+    private boolean disposed;
     private Activity activity;
     private String mDailyKey = "";
     private String mTerminalId = "";
@@ -234,8 +235,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                             connectivityManager.bindProcessToNetwork(network);
                         }
-                        if (!connectionStarted) {
-                            connectionStarted = true;
+                        if (!Utility.ConnectionStarted) {
+                            Utility.ConnectionStarted = true;
                             handleConnect(ipAddress);
                         }
                     }
@@ -243,14 +244,14 @@ public class EfuelingConnect implements JNICallbackInterface {
                     @Override
                     public void onLosing(@NonNull Network network, int maxMsToLive) {
                         super.onLosing(network, maxMsToLive);
-                        connectionStarted = false;
+                        Utility.ConnectionStarted = false;
                     }
 
                     @Override
                     public void onLost(@NonNull Network network) {
                         wifiAvailability = 2;
                         super.onLost(network);
-                        connectionStarted = false;
+                        Utility.ConnectionStarted = false;
                         data_interface.initComplete(false);
                     }
 
@@ -258,7 +259,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     public void onUnavailable() {
                         wifiAvailability = 1;
                         super.onUnavailable();
-                        connectionStarted = false;
+                        Utility.ConnectionStarted = false;
                     }
                 };
                 connectivityManager.requestNetwork(networkRequest, networkCallback);
@@ -276,18 +277,6 @@ public class EfuelingConnect implements JNICallbackInterface {
             @Override
             public void onTick(long l) {
                 nativeLibJava.ep_ms_timer();
-                //data_interface.getStates(nativeLibJava.ep_get_pump_state(), nativeLibJava.ep_get_cur_state());
-                Intent intent = new Intent("get_States");
-                intent.putExtra("pump_state", nativeLibJava.ep_get_pump_state());
-                intent.putExtra("transaction_state", nativeLibJava.ep_get_cur_state());
-                intent.putExtra("transaction_error_string", nativeLibJava.ep_get_err_details());
-                intent.putExtra("volume_sold", nativeLibJava.ep_get_vol_sold());
-                intent.putExtra("amount_sold", nativeLibJava.ep_get_amo_sold());
-                intent.putExtra("transaction_value", nativeLibJava.ep_get_value());
-                intent.putExtra("transaction_type", nativeLibJava.ep_get_value_ty());
-                intent.putExtra("transaction_session_id", nativeLibJava.ep_get_session_id());
-                //LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
-                LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
             }
 
             @Override
@@ -296,6 +285,38 @@ public class EfuelingConnect implements JNICallbackInterface {
             }
         };
         countDownTimer.start();
+
+        messageCountDownTimer = new CountDownTimer(60000, 500) {
+            @Override
+            public void onTick(long l) {
+                int pumpState = nativeLibJava.ep_get_pump_state();
+                int transState = nativeLibJava.ep_get_cur_state();
+                String transError = nativeLibJava.ep_get_err_details();
+                float volume = nativeLibJava.ep_get_vol_sold();
+                float amount = nativeLibJava.ep_get_amo_sold();
+                float transValue = nativeLibJava.ep_get_value();
+                byte transType = nativeLibJava.ep_get_value_ty();
+                String transSessionId = nativeLibJava.ep_get_session_id();
+
+                Intent intent = new Intent("get_States");
+                intent.putExtra("pump_state", pumpState);
+                intent.putExtra("transaction_state", transState);
+                intent.putExtra("transaction_error_string", transError);
+                intent.putExtra("volume_sold", volume);
+                intent.putExtra("amount_sold", amount);
+                intent.putExtra("transaction_value", transValue);
+                intent.putExtra("transaction_type", transType);
+                intent.putExtra("transaction_session_id", transSessionId);
+                //LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+            }
+
+            @Override
+            public void onFinish() {
+                start();
+            }
+        };
+        messageCountDownTimer.start();
 
         if (!runCalled) {
             runCalled = true;
@@ -318,7 +339,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                 try {
                     socket = new Socket(ip, 5555);
                     socket.setKeepAlive(true);
-
                     OutputStream out = socket.getOutputStream();
 
                     output = new PrintWriter(out);
@@ -419,6 +439,11 @@ public class EfuelingConnect implements JNICallbackInterface {
                 if (countDownTimer != null) {
                     countDownTimer.cancel();
                     countDownTimer = null;
+                }
+
+                if (messageCountDownTimer != null) {
+                    messageCountDownTimer.cancel();
+                    messageCountDownTimer = null;
                 }
                 if (nativeLibJava != null){
                     //nativeLibJava.ep_end_trans();
