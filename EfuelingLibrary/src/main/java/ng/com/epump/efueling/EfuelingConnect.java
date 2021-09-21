@@ -35,24 +35,20 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import io.socket.client.IO;
-import io.socket.emitter.Emitter;
 import ng.com.epump.efueling.interfaces.IData;
 
 import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
 
 import ng.com.epump.efueling.models.Ep_Run;
+import ng.com.epump.efueling.models.Transaction;
 import ng.com.epump.efueling.models.TransactionType;
-import ng.com.epump.efueling.models.ValueType;
+import ng.com.epump.efueling.models.TransactionValueType;
 import ng.com.epump.efueling.ui.NFCActivity;
 import ng.com.epump.efueling.ui.TransactionActivity;
 
@@ -60,6 +56,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private static final int GA_NFC_REQUEST_CODE = 0011;
     private static final int EP_NFC_REQUEST_CODE = 0012;
     public static final int TRANSACTION_START = 213;
+    public static final int EP_SETTINGS_REQUEST_CODE = 0100;
     public NativeLibJava nativeLibJava;
     @SuppressLint("StaticFieldLeak")
     private static EfuelingConnect _connect;
@@ -219,42 +216,53 @@ public class EfuelingConnect implements JNICallbackInterface {
                 networkRequest = new NetworkRequest.Builder()
                         .addTransportType(NetworkCapabilities.TRANSPORT_WIFI).build();
             }
-            final ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-            ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback(){
-                @Override
-                public void onAvailable(@NonNull Network network) {
-                    super.onAvailable(network);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        connectivityManager.bindProcessToNetwork(network);
+            boolean cnt = true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (!Settings.System.canWrite(mContext)){
+                    cnt = false;
+                    Intent goToSettings = new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS);
+                    goToSettings.setData(Uri.parse("package:" + mContext.getPackageName()));
+                    ((Activity) mContext).startActivityForResult(goToSettings, EP_SETTINGS_REQUEST_CODE);
+                }
+            }
+            if (cnt){
+                final ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback(){
+                    @Override
+                    public void onAvailable(@NonNull Network network) {
+                        super.onAvailable(network);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            connectivityManager.bindProcessToNetwork(network);
+                        }
+                        if (!connectionStarted) {
+                            connectionStarted = true;
+                            handleConnect(ipAddress);
+                        }
                     }
-                    if (!connectionStarted) {
-                        connectionStarted = true;
-                        handleConnect(ipAddress);
+
+                    @Override
+                    public void onLosing(@NonNull Network network, int maxMsToLive) {
+                        super.onLosing(network, maxMsToLive);
+                        connectionStarted = false;
                     }
-                }
 
-                @Override
-                public void onLosing(@NonNull Network network, int maxMsToLive) {
-                    super.onLosing(network, maxMsToLive);
-                    connectionStarted = false;
-                }
+                    @Override
+                    public void onLost(@NonNull Network network) {
+                        wifiAvailability = 2;
+                        super.onLost(network);
+                        connectionStarted = false;
+                        data_interface.initComplete(false);
+                    }
 
-                @Override
-                public void onLost(@NonNull Network network) {
-                    wifiAvailability = 2;
-                    super.onLost(network);
-                    connectionStarted = false;
-                    data_interface.initComplete(false);
-                }
-
-                @Override
-                public void onUnavailable() {
-                    wifiAvailability = 1;
-                    super.onUnavailable();
-                    connectionStarted = false;
-                }
-            };
-            connectivityManager.requestNetwork(networkRequest, networkCallback);
+                    @Override
+                    public void onUnavailable() {
+                        wifiAvailability = 1;
+                        super.onUnavailable();
+                        connectionStarted = false;
+                    }
+                };
+                connectivityManager.requestNetwork(networkRequest, networkCallback);
+            }
         }
     }
 
@@ -336,7 +344,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                                         input.close();
                                         socket.close();
 
-                                    } catch (IOException e) {
+                                    } catch (Exception e) {
                                         e.printStackTrace();
                                     }
                                 }
@@ -380,7 +388,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                     yy = yy - 2000;
                     int time = nativeLibJava.ep_get_time_int(ss, mm, hh, dd, mon, yy);
 
-                    nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) ValueType.Amount.ordinal(), (float) amount, time, mTerminalId);
+                    nativeLibJava.ep_start_trans(pumpName, transactionType.ordinal(), tag, (byte) TransactionValueType.Amount.ordinal(), (float) amount, time, mTerminalId);
                 }
             }).start();
 
@@ -473,6 +481,21 @@ public class EfuelingConnect implements JNICallbackInterface {
             activity.startActivityForResult(intent, GA_NFC_REQUEST_CODE);
         } catch (ActivityNotFoundException e) {
             Toast.makeText(mContext, "Activity Not Found", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public void readTransactions(int count){
+        int counter = 1;
+        while (nativeLibJava.ep_get_transaction(counter) == 0 || counter <= count){
+            byte transType = nativeLibJava.ep_read_trans_ty();
+            String transId = nativeLibJava.ep_read_trans_uid();
+            double transValue = nativeLibJava.ep_read_trans_value();
+            byte transValueType = nativeLibJava.ep_read_trans_value_ty();
+
+            String transactionType = TransactionType.get(transType);
+            String transactionValueType = TransactionValueType.get(transValueType);
+            new Transaction(transactionType, transId, transValue, transactionValueType);
+            counter++;
         }
     }
 }

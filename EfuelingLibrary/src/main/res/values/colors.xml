@@ -8,4 +8,5 @@
     <color name="libraryGradientStart">#9DB6EA</color>
     <color name="libraryGradientMid">#96B0E6</color>
     <color name="libraryGradientEnd">#446ABE</color>
+    <color name="libraryTranCompleteColor">#24E979</color>
 </resources>

@@ -1,6 +1,7 @@
 package ng.com.epump.efueling.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import android.content.BroadcastReceiver;
@@ -9,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -17,17 +17,16 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import java.util.Date;
-
 import ng.com.epump.efueling.R;
 import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
 import ng.com.epump.efueling.models.TransactionState;
 import ng.com.epump.efueling.models.Utility;
-import ng.com.epump.efueling.models.ValueType;
+import ng.com.epump.efueling.models.TransactionValueType;
 
 public class TransactionActivity extends AppCompatActivity {
     private Context context;
+    private ConstraintLayout constraintLayout;
     private LinearLayout layoutTrans;
     private ProgressBar progressBar;
     private TextView txtTransState, txtProgress, txtAuthorizedAmount, txtVolume,
@@ -44,7 +43,7 @@ public class TransactionActivity extends AppCompatActivity {
     private long transactionDate;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
+        public void onReceive(final Context context, Intent intent) {
             pumpState = intent.getIntExtra("pump_state", 0);
             transactionState = intent.getIntExtra("transaction_state", 0);
             errorString = intent.getStringExtra("transaction_error_string");
@@ -57,7 +56,7 @@ public class TransactionActivity extends AppCompatActivity {
                 amount = Double.parseDouble(Float.valueOf(intent.getFloatExtra("amount_sold", 0f)).toString());
                 volume = Double.parseDouble(Float.valueOf(intent.getFloatExtra("volume_sold", 0f)).toString());
                 transactionStarted = true;
-                if (transType == ValueType.Amount.ordinal()) {
+                if (transType == TransactionValueType.Amount.ordinal()) {
                         if (amount >= transValue){
                         transComplete = true;
                     }
@@ -65,7 +64,7 @@ public class TransactionActivity extends AppCompatActivity {
                         percentage = (int) ((amount / transValue) * 100);
                     }
                 }
-                else if (transType == ValueType.Volume.ordinal()) {
+                else if (transType == TransactionValueType.Volume.ordinal()) {
                     if (volume >= transValue){
                         transComplete = true;
                     }
@@ -82,10 +81,10 @@ public class TransactionActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (transType == ValueType.Amount.ordinal()) {
+                    if (transType == TransactionValueType.Amount.ordinal()) {
                         txtValueType.setText("Amount Authorized");
                     }
-                    else if (transType == ValueType.Volume.ordinal()) {
+                    else if (transType == TransactionValueType.Volume.ordinal()) {
                         txtValueType.setText("Volume Authorized");
                     }
                     if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING || transactionState == TransactionState.ST_PUMP_FILL_COMP) {
@@ -147,6 +146,17 @@ public class TransactionActivity extends AppCompatActivity {
                     }
 
                     txtProgress.setText(String.format("%d%%", percentage));
+
+                    if(transComplete){
+                        if (constraintLayout != null){
+                            constraintLayout.setBackgroundColor(getResources().getColor(R.color.libraryTranCompleteColor));
+                        }
+
+                        if (btnEndTrans != null){
+                            btnEndTrans.setBackgroundColor(getResources().getColor(R.color.libraryColorPrimary));
+                            btnEndTrans.setTextColor(getResources().getColor(R.color.libraryColorWhite));
+                        }
+                    }
                 }
             });
         }
@@ -160,6 +170,7 @@ public class TransactionActivity extends AppCompatActivity {
         setTheme(R.style.Library_Theme);
         context = this;
 
+        constraintLayout = findViewById(R.id.constraintLayout);
         layoutTrans = findViewById(R.id.layoutTrans);
         txtTransState = findViewById(R.id.txtTransState);
         progressBar = findViewById(R.id.progressBar);
