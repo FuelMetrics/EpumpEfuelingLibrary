@@ -14,7 +14,7 @@ public class TransactionState {
 
     public static String getString(int state, String... pumpName) {
         String resp = "";
-        String pName = (pumpName != null && pumpName.length > 0) ? (pumpName[0].length() > 1 ? pumpName[0].substring(1) : pumpName[0]) : "";
+        String pName = (pumpName != null && pumpName.length > 0) ? removeAlphabets(pumpName[0]) : "";
         switch (state) {
             case ST_INIT:
                 resp = "Go setting up";
@@ -50,5 +50,9 @@ public class TransactionState {
                 resp = "-" + state;
         }
         return resp;
+    }
+
+    private static String removeAlphabets(String str){
+        return str.replaceAll("[^\\d.]", "");
     }
 }

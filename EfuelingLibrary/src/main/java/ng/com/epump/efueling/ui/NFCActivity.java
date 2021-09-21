@@ -137,7 +137,7 @@ public class NFCActivity extends AppCompatActivity {
             Intent intent = new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent nfcPendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
             mNfcAdapter.enableForegroundDispatch(this, nfcPendingIntent, filters, techList);
-        } catch (IllegalStateException ex) {
+        } catch (Exception ex) {
             Log.e("TAG", "Error enabling NFC foreground dispatch", ex);
         }
     }
@@ -145,7 +145,7 @@ public class NFCActivity extends AppCompatActivity {
     private void disableNfcForegroundDispatch() {
         try {
             mNfcAdapter.disableForegroundDispatch(this);
-        } catch (IllegalStateException ex) {
+        } catch (Exception ex) {
             Log.e("TAG", "Error disabling NFC foreground dispatch", ex);
         }
     }

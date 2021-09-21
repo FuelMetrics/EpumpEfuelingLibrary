@@ -3,16 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ng.com.epump.efueling">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.NFC" />
-    <uses-permission
+    <uses-permission android:name="android.permission.NFC" />-->
+    <!--<uses-permission
         android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.INTERNET" />
+        tools:ignore="ProtectedPermissions" />-->
+    <!--<uses-permission android:name="android.permission.INTERNET" />-->
 
     <application>
         <activity

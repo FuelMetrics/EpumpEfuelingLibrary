@@ -1,44 +1,49 @@
-apply plugin: 'com.android.library'
+plugins {
+    id 'com.android.library'
+}
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 29
+        minSdkVersion 21
+        targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        //consumerProguardFiles "consumer-rules.pro"
+        consumerProguardFiles "consumer-rules.pro"
     }
-
     sourceSets.main {
         jni.srcDirs = [] // This prevents the auto generation of Android.mk
+//        sourceSets.main.jni.srcDirs = []
         jniLibs.srcDir 'libs'
         // This is not necessary unless you have precompiled libraries in your project.
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    api fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.0'
     implementation 'com.google.android.material:material:1.4.0'
-    /*implementation ('io.socket:socket.io-client:2.0.1') {
-        // excluding org.json which is provided by Android
-        exclude group: 'org.json', module: 'json'
-    }*/
-    testImplementation 'junit:junit:4.12'
+
+    /*implementation "io.realm:realm-android-library:5.7.0"*/
+    implementation "com.interswitchng:smart-pos-core:2.1.2"
+
+    implementation "com.interswitchng:smart-pos-emv-pax:2.1.2"
+    implementation "com.interswitchng:smart-pos-emv-telpo:2.1.2"
+
+    testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-
 }
