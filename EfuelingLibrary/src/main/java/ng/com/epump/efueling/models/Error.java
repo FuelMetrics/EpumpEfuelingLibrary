@@ -7,7 +7,7 @@ public class Error {
             error = error.substring(6, error.length() - 1);
         }
         error = error.trim();
-        if (error.equalsIgnoreCase("NULL")){
+        if (error.toUpperCase().contains("NULL")){
             return errorString;
         }
         String[] err = error.split(":");
