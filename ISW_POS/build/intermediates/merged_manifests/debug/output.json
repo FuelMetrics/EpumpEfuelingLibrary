@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "applicationId": "ng.com.epump.pos.isw",
+  "variantType": "LIBRARY",
+  "elements": [
+    {
+      "outputType": {
+        "type": "MERGED_MANIFESTS"
+      },
+      "apkData": {
+        "type": "MAIN",
+        "splits": [],
+        "versionCode": 1,
+        "versionName": "1.0",
+        "outputFile": "ISW_POS-debug.aar",
+        "fullName": "debug",
+        "baseName": "debug",
+        "dirName": ""
+      },
+      "path": "../../library_manifest/debug/AndroidManifest.xml",
+      "properties": {
+        "packageId": "ng.com.epump.pos.isw",
+        "split": ""
+      }
+    }
+  ]
+}

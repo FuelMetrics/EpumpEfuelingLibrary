@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="ng.com.epump.efueling"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="14"
+        android:targetSdkVersion="29" />
+    <!--
+    android:sharedUserId="android.uid.system"
+    coreApp="true"
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+
+    <application>
+
+<!--         android:process="system" -->
+        <activity
+            android:name="ng.com.epump.efueling.ui.NFCActivity"
+            android:exported="true"
+            android:theme="@style/Library_Theme" />
+        <activity
+            android:name="ng.com.epump.efueling.ui.TransactionActivity"
+            android:theme="@style/Library_Theme" />
+    </application>
+
+</manifest>

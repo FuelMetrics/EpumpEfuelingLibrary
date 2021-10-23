@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:id="@+id/layCard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="20sp"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_credit_card"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30sp"
+                    android:text="Card"
+                    android:textColor="@color/libraryColorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/libraryColorGray"/>
+            <LinearLayout
+                android:id="@+id/layQR"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="20sp"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_qr_code"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30sp"
+                    android:text="QR Code"
+                    android:textColor="@color/libraryColorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/libraryColorGray"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="2">
+            <LinearLayout
+                android:id="@+id/layUSSd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="20sp"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_ussd"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30sp"
+                    android:text="USSD"
+                    android:textColor="@color/libraryColorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@color/libraryColorGray"/>
+            <LinearLayout
+                android:id="@+id/layPayCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingVertical="20sp"
+                android:layout_weight="1"
+                android:layout_gravity="center">
+                <ImageView
+                    android:layout_width="50sp"
+                    android:layout_height="50sp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_pay_code"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="30sp"
+                    android:text="Pay Code"
+                    android:textColor="@color/libraryColorPrimary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/libraryColorGray"/>
+    <TextView
+        android:id="@+id/txtCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Cancel"
+        android:padding="20sp"
+        android:textColor="@color/libraryColorPrimary"
+        android:textSize="15sp"
+        android:textStyle="bold"/>
+</LinearLayout>

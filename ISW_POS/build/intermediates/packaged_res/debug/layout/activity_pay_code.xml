@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.PayCodeActivity">
+    <!--Enter PayCode UI-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutInputCode"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:paddingHorizontal="20sp"
+        android:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/btnContinue"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/txtAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20sp"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:text="5,000"
+                android:layout_marginBottom="50sp"
+                android:textColor="@color/libraryColorPrimary"/>
+
+            <TextView android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="20sp"
+                android:textSize="30sp"
+                android:textStyle="bold"
+                android:text="Pay With PayCode"
+                android:textColor="@color/libraryColorPrimary"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:textSize="14sp"
+                android:text="Type in your PayCode or tap the button to scan your PayCode"
+                android:layout_marginBottom="20sp"
+                android:textColor="#000"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20sp"
+                android:hint="Enter your PayCode"
+                app:hintAnimationEnabled="false"
+                app:hintEnabled="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/txtPayCode"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="20sp"
+                    android:textSize="20sp"
+                    android:hint="Enter your PayCode"
+                    android:imeActionLabel="Continue"
+                    android:imeOptions="actionDone"
+                    android:inputType="numberDecimal"
+                    tools:ignore="TextContrastCheck" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnContinue"
+            style="@style/AltButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingVertical="14sp"
+            android:text="Continue"
+            android:textAllCaps="false"
+            app:layout_constraintBottom_toTopOf="@+id/btnScanQR"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <Button
+            android:id="@+id/btnScanQR"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Scan PayCode"
+            android:paddingVertical="14sp"
+            android:textAllCaps="false"
+            style="@style/Button"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!--Processing Transaction UI-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutProcessingTransaction"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/libraryColorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Processing Transaction"
+                android:gravity="center"
+                android:padding="20sp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/libraryColorWhite"/>
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="90sp"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_gravity="center"
+                android:indeterminate="true"
+                android:indeterminateTint="@color/libraryColorWhite"/>
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

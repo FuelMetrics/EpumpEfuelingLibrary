@@ -1,0 +1,68 @@
+ng/com/epump/efueling/models/PumpState.java
+ ng.com.epump.efueling.models.PumpState
+ng/com/epump/efueling/models/TransactionType.java
+ ng.com.epump.efueling.models.TransactionType
+com/fuelmetrics/epumpwifitool/NativeLibJava.java
+ com.fuelmetrics.epumpwifitool.NativeLibJava
+ng/com/epump/efueling/BluetoothUtils.java
+ ng.com.epump.efueling.BluetoothUtils
+ ng.com.epump.efueling.BluetoothUtils$1
+ ng.com.epump.efueling.BluetoothUtils$2
+ ng.com.epump.efueling.BluetoothUtils$3
+ ng.com.epump.efueling.BluetoothUtils$4
+ ng.com.epump.efueling.BluetoothUtils$4$1
+ng/com/epump/efueling/models/GoErrorType.java
+ ng.com.epump.efueling.models.GoErrorType
+com/fuelmetrics/epumpwifitool/JNICallbackInterface.java
+ com.fuelmetrics.epumpwifitool.JNICallbackInterface
+ng/com/epump/efueling/ui/NFCActivity.java
+ ng.com.epump.efueling.ui.NFCActivity
+ ng.com.epump.efueling.ui.NFCActivity$1
+ ng.com.epump.efueling.ui.NFCActivity$2
+ ng.com.epump.efueling.ui.NFCActivity$3
+ ng.com.epump.efueling.ui.NFCActivity$4
+ ng.com.epump.efueling.ui.NFCActivity$5
+ng/com/epump/efueling/ui/TransactionActivity.java
+ ng.com.epump.efueling.ui.TransactionActivity
+ ng.com.epump.efueling.ui.TransactionActivity$1
+ ng.com.epump.efueling.ui.TransactionActivity$1$1
+ ng.com.epump.efueling.ui.TransactionActivity$2
+ ng.com.epump.efueling.ui.TransactionActivity$3
+ng/com/epump/efueling/interfaces/TransactionCallback.java
+ ng.com.epump.efueling.interfaces.TransactionCallback
+ng/com/epump/efueling/models/TransactionState.java
+ ng.com.epump.efueling.models.TransactionState
+ng/com/epump/efueling/models/Transaction.java
+ ng.com.epump.efueling.models.Transaction
+ng/com/epump/efueling/models/RandomGenerator.java
+ ng.com.epump.efueling.models.RandomGenerator
+ng/com/epump/efueling/interfaces/BluetoothUtilsCallback.java
+ ng.com.epump.efueling.interfaces.BluetoothUtilsCallback
+ng/com/epump/efueling/EfuelingConnect.java
+ ng.com.epump.efueling.EfuelingConnect
+ ng.com.epump.efueling.EfuelingConnect$1
+ ng.com.epump.efueling.EfuelingConnect$2
+ ng.com.epump.efueling.EfuelingConnect$3
+ ng.com.epump.efueling.EfuelingConnect$4
+ ng.com.epump.efueling.EfuelingConnect$5
+ ng.com.epump.efueling.EfuelingConnect$6
+ ng.com.epump.efueling.EfuelingConnect$7
+ ng.com.epump.efueling.EfuelingConnect$8
+ng/com/epump/efueling/models/Ep_Run.java
+ ng.com.epump.efueling.models.Ep_Run
+ng/com/epump/efueling/BuildConfig.java
+ ng.com.epump.efueling.BuildConfig
+ng/com/epump/efueling/models/Utility.java
+ ng.com.epump.efueling.models.Utility
+ng/com/epump/efueling/models/ErrorType.java
+ ng.com.epump.efueling.models.ErrorType
+ng/com/epump/efueling/models/TransactionValueType.java
+ ng.com.epump.efueling.models.TransactionValueType
+ng/com/epump/efueling/models/Error.java
+ ng.com.epump.efueling.models.Error
+ng/com/epump/efueling/models/LibraryErrorType.java
+ ng.com.epump.efueling.models.LibraryErrorType
+ng/com/epump/efueling/models/ServerErrorType.java
+ ng.com.epump.efueling.models.ServerErrorType
+ng/com/epump/efueling/interfaces/IData.java
+ ng.com.epump.efueling.interfaces.IData
