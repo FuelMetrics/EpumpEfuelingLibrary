@@ -21,6 +21,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Parcelable;
+import android.os.Process;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -405,10 +406,11 @@ public class EfuelingConnect implements JNICallbackInterface {
     }
     /*WiFi methods ended*/
 
-    private void pushDataToLib(String dataToSend) {
+    private void pushDataToLib(final String dataToSend) {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 if (dataToSend != null) {
                     nativeLibJava.ep_rx_data(dataToSend, dataToSend.length());
                 }

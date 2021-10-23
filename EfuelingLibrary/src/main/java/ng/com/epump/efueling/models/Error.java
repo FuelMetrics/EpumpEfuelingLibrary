@@ -1,5 +1,7 @@
 package ng.com.epump.efueling.models;
 
+import java.util.Calendar;
+
 public class Error {
     public static String getError(String error){
         String errorString = "";
@@ -34,6 +36,7 @@ public class Error {
         else if (errorType.equalsIgnoreCase(ErrorType.L.name())){
             errorString = "Library - " + LibraryErrorType.getString(errorCode);
         }
-        return errorString + " - " + error;
+        String time = Utility.parseDate(Calendar.getInstance().getTime(), "EEE MMM dd, yyyy hh:mm aa");
+        return errorString + " - " + error +  " /n" + time;
     }
 }

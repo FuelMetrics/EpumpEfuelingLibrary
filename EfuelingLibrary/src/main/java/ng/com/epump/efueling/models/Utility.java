@@ -1,6 +1,8 @@
 package ng.com.epump.efueling.models;
 
 import java.security.SecureRandom;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Utility {
     public static boolean ConnectionStarted;
@@ -35,5 +37,10 @@ public class Utility {
             stringBuilder.append(buffer);
         }
         return stringBuilder.toString();
+    }
+
+    public static String parseDate(Date date, String pattern) {
+        SimpleDateFormat format = new SimpleDateFormat(pattern);
+        return format.format(date);
     }
 }

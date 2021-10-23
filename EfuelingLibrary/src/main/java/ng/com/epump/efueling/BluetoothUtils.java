@@ -50,7 +50,7 @@ public class BluetoothUtils {
     private boolean stopScan = false, bluetoothFound = false, resp = false;
 
     public BluetoothUtils(Context context, String macAddress, BluetoothUtilsCallback callback) {
-        macAddress = "E8:DB:84:1D:A2:C2";
+        //macAddress = "E8:DB:84:1D:A2:C2";
         this.mContext = context;
         this.mMacAddr = macAddress;
         this.mUtilsCallback = callback;
@@ -61,7 +61,7 @@ public class BluetoothUtils {
     }
 
     public void startBLE(){
-        if (mMacAddr.isEmpty()){
+        if (mMacAddr == null || mMacAddr.isEmpty()){
             return;
         }
         BluetoothManager bluetoothManager = (BluetoothManager) mContext.getSystemService(Context.BLUETOOTH_SERVICE);

@@ -29,6 +29,7 @@ import java.util.Set;
 
 import ng.com.epump.efueling.EfuelingConnect;
 import ng.com.epump.efueling.interfaces.IData;
+import ng.com.epump.efueling.interfaces.TransactionCallback;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.Utility;
 
@@ -130,10 +131,17 @@ public class MainActivity extends AppCompatActivity implements IData {
                         else if (transactionType == TransactionType.Offline_POS.ordinal()){
                             transactionType1 = TransactionType.Offline_POS;
                         }
-                        int done = efuelingConnect.startTransaction(transactionType1, "P1", tag, amount);
-                        if (done > 0){
-                            Toast.makeText(context, "WIFI not available", Toast.LENGTH_LONG).show();
-                        }
+                        efuelingConnect.startTransaction(transactionType1, "P1", "", tag, amount, new TransactionCallback() {
+                            @Override
+                            public void onStarted() {
+
+                            }
+
+                            @Override
+                            public void onCompleted() {
+
+                            }
+                        });
                     }
                     else{
                         Toast.makeText(context, "Input tag", Toast.LENGTH_LONG).show();

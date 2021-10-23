@@ -98,16 +98,9 @@ public class TransactionActivity extends AppCompatActivity {
                     else {
                         layoutTrans.setVisibility(View.GONE);
                     }
-                    /*Log.i("TAG", "run: pumpState " + pumpState);
-                    Log.i("TAG", "run: transactionState " + transactionState);
-                    Log.i("TAG", "run: errorString " + errorString);
-                    Log.i("TAG", "run: amount " + amount);
-                    Log.i("TAG", "run: volume " + volume);*/
                     String transState = TransactionState.getString(transactionState, pumpDisplayName);
                     String pState = PumpState.getString(pumpState);
 
-                    /*Log.i("TAG", "run: trans-state " + transState);
-                    Log.i("TAG", "run: pump-state " + pState);*/
                     if (transactionState == TransactionState.ST_ERROR || transactionState == TransactionState.ST_LIB_ERROR ||
                             transactionState == TransactionState.ST_PUMP_BUSY /*|| transactionState == TransactionState.ST_IDLE*/) {
                         if (transactionState == TransactionState.ST_PUMP_BUSY){
