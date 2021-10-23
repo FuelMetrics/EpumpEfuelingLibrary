@@ -1,0 +1,77 @@
+-- Merging decision tree log ---
+manifest
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:2:1-30:12
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:2:1-30:12
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:2:1-30:12
+	package
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:4:5-36
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+	xmlns:tools
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:3:5-51
+	xmlns:android
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.ACCESS_FINE_LOCATION
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:8:5-79
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:8:22-76
+uses-permission#android.permission.BLUETOOTH
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:9:5-68
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:9:22-65
+uses-permission#android.permission.BLUETOOTH_ADMIN
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:10:5-74
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:10:22-71
+uses-permission#android.permission.CHANGE_NETWORK_STATE
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:11:5-78
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:11:22-76
+uses-permission#android.permission.CHANGE_WIFI_STATE
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:12:5-76
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:12:22-73
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:13:5-79
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:13:22-76
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:14:5-76
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:14:22-73
+uses-permission#android.permission.WRITE_SETTINGS
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:15:5-16:46
+	tools:ignore
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:16:9-44
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:15:22-70
+application
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:18:5-28:19
+activity#ng.com.epump.efueling.ui.NFCActivity
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:21:9-24:51
+	android:exported
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:23:13-36
+	android:theme
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:24:13-49
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:22:13-43
+activity#ng.com.epump.efueling.ui.TransactionActivity
+ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:25:9-27:52
+	android:theme
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:27:13-49
+	android:name
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:26:13-51
+uses-sdk
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+		ADDED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+		INJECTED from C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml

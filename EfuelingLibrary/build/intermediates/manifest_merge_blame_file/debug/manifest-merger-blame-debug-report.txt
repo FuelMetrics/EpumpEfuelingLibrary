@@ -1,0 +1,63 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    xmlns:tools="http://schemas.android.com/tools"
+4    package="ng.com.epump.efueling" >
+5
+6    <uses-sdk
+7        android:minSdkVersion="14"
+7-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+8        android:targetSdkVersion="29" />
+8-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml
+9    <!--
+10    android:sharedUserId="android.uid.system"
+11    coreApp="true"
+12    -->
+13    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+13-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:8:5-79
+13-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:8:22-76
+14    <uses-permission android:name="android.permission.BLUETOOTH" />
+14-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:9:5-68
+14-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:9:22-65
+15    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+15-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:10:5-74
+15-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:10:22-71
+16    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+16-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:11:5-78
+16-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:11:22-76
+17    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+17-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:12:5-76
+17-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:12:22-73
+18    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+18-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:13:5-79
+18-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:13:22-76
+19    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+19-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:14:5-76
+19-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:14:22-73
+20    <uses-permission
+20-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:15:5-16:46
+21        android:name="android.permission.WRITE_SETTINGS"
+21-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:15:22-70
+22        tools:ignore="ProtectedPermissions" />
+22-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:16:9-44
+23
+24    <application>
+24-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:18:5-28:19
+25
+26<!--         android:process="system" -->
+27        <activity
+27-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:21:9-24:51
+28            android:name="ng.com.epump.efueling.ui.NFCActivity"
+28-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:22:13-43
+29            android:exported="true"
+29-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:23:13-36
+30            android:theme="@style/Library_Theme" />
+30-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:24:13-49
+31        <activity
+31-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:25:9-27:52
+32            android:name="ng.com.epump.efueling.ui.TransactionActivity"
+32-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:26:13-51
+33            android:theme="@style/Library_Theme" />
+33-->C:\Mobile_Dev\epumpconnection\EfuelingLibrary\src\main\AndroidManifest.xml:27:13-49
+34    </application>
+35
+36</manifest>
