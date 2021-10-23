@@ -9,6 +9,8 @@
         <item name="fontFamily">@font/nunito</item>
         <item name="android:textViewStyle">@style/TextStyle</item>
         <item name="buttonStyle">@style/Button</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 
 

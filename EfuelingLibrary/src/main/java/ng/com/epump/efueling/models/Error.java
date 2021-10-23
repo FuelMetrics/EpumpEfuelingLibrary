@@ -21,6 +21,12 @@ public class Error {
             else if (errorCode == GoErrorType.EVT_SOCKET_ERROR.ordinal()){
                 errorString = "Network Error";
             }
+            else if (errorCode == GoErrorType.EVT_VALUE_IS_ZERO.ordinal()){
+                errorString = "Value cannot be zero";
+            }
+            else if (errorCode == GoErrorType.EVT_VALUE_IS_TOO_LOW.ordinal()){
+                errorString = "Transaction value too low";
+            }
             else {
                 errorString = "Unknown Error";
             }

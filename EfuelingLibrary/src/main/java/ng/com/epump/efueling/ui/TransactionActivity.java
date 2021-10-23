@@ -18,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import ng.com.epump.efueling.R;
+import ng.com.epump.efueling.interfaces.TransactionCallback;
 import ng.com.epump.efueling.models.Error;
 import ng.com.epump.efueling.models.PumpState;
 import ng.com.epump.efueling.models.TransactionState;
@@ -34,13 +35,14 @@ public class TransactionActivity extends AppCompatActivity {
     private Button btnEndTrans;
     private ImageView imgDismiss;
     private int pumpState, transactionState;
-    private String errorString = "", sessionId = "", pumpName = "";
+    private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "";
     private double amount = 0, volume = 0, transValue = 0;
     private int transType;
     private int percentage = 0;
     private int return_value;
     private boolean transComplete, errorOccurred, transactionStarted;
     private long transactionDate;
+    private static TransactionCallback mCallback;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
@@ -101,7 +103,7 @@ public class TransactionActivity extends AppCompatActivity {
                     Log.i("TAG", "run: errorString " + errorString);
                     Log.i("TAG", "run: amount " + amount);
                     Log.i("TAG", "run: volume " + volume);*/
-                    String transState = TransactionState.getString(transactionState, pumpName);
+                    String transState = TransactionState.getString(transactionState, pumpDisplayName);
                     String pState = PumpState.getString(pumpState);
 
                     /*Log.i("TAG", "run: trans-state " + transState);
@@ -135,6 +137,9 @@ public class TransactionActivity extends AppCompatActivity {
                     if (transactionState == TransactionState.ST_PUMP_AUTH &&
                             (pumpState == PumpState.NOZZLE_HANG_UP || pumpState == PumpState.PUMP_AUTH_NOZZLE_HANG_UP)){
                         transState = PumpState.getString(pumpState);
+                        if (mCallback != null){
+                            mCallback.onStarted();
+                        }
                     }
                     txtTransState.setText(transState);
 
@@ -184,6 +189,7 @@ public class TransactionActivity extends AppCompatActivity {
         if (getIntent() != null){
             transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
             pumpName = getIntent().getStringExtra("Pump_Name");
+            pumpDisplayName = getIntent().getStringExtra("Pump_Display_Name");
         }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
@@ -233,5 +239,9 @@ public class TransactionActivity extends AppCompatActivity {
         super.onDestroy();
         LocalBroadcastManager.getInstance(context)
                 .unregisterReceiver(infoReceiver);
+    }
+
+    public static void setCallback(TransactionCallback callback){
+        mCallback = callback;
     }
 }

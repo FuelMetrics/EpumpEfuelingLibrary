@@ -14,7 +14,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/EfuelingLibrary" />
-            <option value="$PROJECT_DIR$/ISW_Printer" />
+            <option value="$PROJECT_DIR$/ISW_POS" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>
