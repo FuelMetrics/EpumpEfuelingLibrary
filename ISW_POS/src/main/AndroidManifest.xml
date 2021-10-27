@@ -2,4 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="ng.com.epump.pos.isw">
 
+    <application>
+        <activity
+            android:name=".ui.CardTransactionActivity"
+            android:exported="false"
+            android:theme="@style/Library_Theme" />
+    </application>
+
 </manifest>

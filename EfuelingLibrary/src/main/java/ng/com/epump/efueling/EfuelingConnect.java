@@ -174,16 +174,29 @@ public class EfuelingConnect implements JNICallbackInterface {
         return wifiManager.isWifiEnabled();
     }
 
+    public boolean disconnectCurrentNetwork(){
+        if(wifiManager != null && wifiManager.isWifiEnabled()){
+            int netId = wifiManager.getConnectionInfo().getNetworkId();
+            wifiManager.disableNetwork(netId);
+            return wifiManager.disconnect();
+        }
+        return false;
+    }
+
     public void connect2WifiAndSocket(final String ssid, String password, final String ipAddress){
         do{
             Log.i("TAG", "run: switching wifi on");
         }
         while (!wifiEnabled());
+
+        disconnectCurrentNetwork();
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
             try {
                 WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = "\"" + ssid + "\"";
                 wifiConfig.preSharedKey = "\"" + password + "\"";
+                wifiConfig.priority = 1000;
                 int netId = wifiManager.addNetwork(wifiConfig);
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(netId, true);
@@ -214,6 +227,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                 WifiConfiguration wifiConfig = new WifiConfiguration();
                 wifiConfig.SSID = "\"" + ssid + "\"";
                 wifiConfig.preSharedKey = "\"" + password + "\"";
+                wifiConfig.priority = 1000;
                 int netId = wifiManager.addNetwork(wifiConfig);
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(netId, true);
@@ -472,6 +486,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             intent.putExtra("Transaction_Date", transactionDate.getTime());
             intent.putExtra("Pump_Name", pumpName);
             intent.putExtra("Pump_Display_Name", pumpDisplayName);
+            intent.putExtra("voucher_card_number", tag);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
             try{
                 TransactionActivity.setCallback(callback);

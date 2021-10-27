@@ -1,15 +1,14 @@
 package ng.com.epump.pos.isw;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Process;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
-import androidx.work.WorkerParameters;
 
 import com.interswitch.smartpos.emv.telpo.TelpoPOSDeviceImpl;
 import com.interswitchng.smartpos.IswPos;
@@ -21,50 +20,44 @@ import com.interswitchng.smartpos.models.core.TerminalInfo;
 import com.interswitchng.smartpos.models.posconfig.PrintObject;
 import com.interswitchng.smartpos.models.posconfig.PrintStringConfiguration;
 import com.interswitchng.smartpos.models.printer.info.PrintStatus;
-import com.interswitchng.smartpos.models.transaction.cardpaycode.EmvMessage;
+import com.interswitchng.smartpos.models.printer.info.TransactionType;
+import com.interswitchng.smartpos.models.transaction.TransactionLog;
 import com.interswitchng.smartpos.shared.interfaces.device.POSDevice;
 import com.interswitchng.smartpos.shared.services.kimono.models.AllTerminalInfo;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CancellationException;
 
 import kotlin.Unit;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
-import kotlin.jvm.functions.Function1;
 import kotlinx.coroutines.CoroutineScope;
-import kotlinx.coroutines.CoroutineScopeKt;
-import kotlinx.coroutines.channels.Channel;
-import kotlinx.coroutines.channels.ChannelIterator;
-import kotlinx.coroutines.channels.SendChannel;
-import kotlinx.coroutines.channels.ValueOrClosed;
-import kotlinx.coroutines.selects.SelectClause1;
-import kotlinx.coroutines.selects.SelectClause2;
+import kotlinx.coroutines.GlobalScope;
+import ng.com.epump.pos.isw.ui.CardTransactionActivity;
 
 public class ISW_POS {
     private PrintStringConfiguration bold, boldCenter, boldTitleCenter, normalTitleCenter, normalCenter, normal;
 
     private static POSDevice posDevice;
     private static POSConfig posConfig;
-    private static IswTxnHandler iswTxnHandler;
+    public static IswTxnHandler iswTxnHandler;
     private static CoroutineScope coroutineScope;
-    private static Context mContext;
+    private Context mContext;
     static String clientId = "IKIAB23A4E2756605C1ABC33CE3C287E27267F660D61";
     static String clientSecret = "secret";
     static String alias = "000007";
     static String merchantCode = "MX5882";
     static String phoneNumber= "20390007";
+    private static TerminalInfo terminalInfo;
 
-    public ISW_POS(Context context, boolean pax) {
+    public ISW_POS(Context context, boolean pax, TerminalInfoCallback callback) {
         if (mContext == null){
-            Init(context, pax);
+            Init(context, pax, callback);
         }
-        coroutineScope = CoroutineScopeKt.CoroutineScope((CoroutineContext) mContext);
+        coroutineScope = GlobalScope.INSTANCE;
     }
 
-    private static void Init(Context context, boolean pax) {
+    private void Init(Context context, boolean pax, TerminalInfoCallback callback) {
         mContext = context;
         if (pax){
             posDevice = POSDeviceImpl.create(context.getApplicationContext());
@@ -77,9 +70,60 @@ public class ISW_POS {
                 null, posConfig, false, false);
 
         iswTxnHandler = new IswTxnHandler(posDevice);
-        BackgroundWorker.iswTxnHandler = iswTxnHandler;
-        WorkRequest request = new OneTimeWorkRequest.Builder(BackgroundWorker.class).build();
-        WorkManager.getInstance(context).enqueue(request);
+        terminalInfo = iswTxnHandler.getTerminalInfo();
+        if (terminalInfo == null){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+                    AllTerminalInfo allInfo = (AllTerminalInfo) iswTxnHandler.downloadTmKimParam(new Continuation<AllTerminalInfo>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return coroutineScope.getCoroutineContext();
+                        }
+
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
+                            Log.i("TAG", "resumeWith: ");
+                        }
+                    });
+
+                    if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
+                        terminalInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
+                        iswTxnHandler.saveTerminalInfo(terminalInfo);
+                        callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
+                    }
+                }
+            }).start();
+        }
+        else{
+            callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+
+                boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
+                if (keyDownloaded){
+                    iswTxnHandler.getToken(terminalInfo, new Continuation<Unit>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return coroutineScope.getCoroutineContext();
+                        }
+
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
+
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     public void PrintTransaction(PrintTransactionModel model) throws Exception{
@@ -152,140 +196,67 @@ public class ISW_POS {
         });*/
     }
 
-    public void Pay(double amount, PaymentCallback callback) throws Exception{
+    public void printEOD(List<TransactionLog> transactionLogs, String date){
+        iswTxnHandler.printEod(TransactionType.Purchase,transactionLogs,date, terminalInfo);
+    }
+
+    public PrintStatus printTransaction(Bitmap bitmap){
+        return iswTxnHandler.printslip(bitmap);
+    }
+
+    public void setupTransaction(double amount, String amountString) throws Exception{
         if (posDevice == null){
             throw new Exception("Call init method to initialize library");
         }
         int amountToPay = (int) (amount * 100);
-        TerminalInfo terminalInfo = iswTxnHandler.getTerminalInfo();
-        iswTxnHandler.setupTransaction(amountToPay, Objects.requireNonNull(terminalInfo), coroutineScope, new Channel<EmvMessage>() {
-            @Override
-            public boolean isClosedForReceive() {
-                return false;
-            }
+        terminalInfo = iswTxnHandler.getTerminalInfo();
 
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
+        Intent intent = new Intent(mContext, CardTransactionActivity.class);
+        intent.putExtra("amount_to_pay", amountToPay);
+        intent.putExtra("amount_to_pay_string", amountString);
+        ((Activity)(mContext)).startActivityForResult(intent, 234);
+    }
 
-            @Nullable
-            @Override
-            public Object receive(@NonNull Continuation<? super EmvMessage> continuation) {
-                return null;
-            }
+    public PrintStatus printerStatus(){
+        return iswTxnHandler.checkPrintStatus();
+    }
 
-            @NonNull
-            @Override
-            public SelectClause1<EmvMessage> getOnReceive() {
-                return null;
-            }
+    public void getTerminal(TerminalInfoCallback callback){
+        final TerminalInfo[] terminalInfo = {iswTxnHandler.getTerminalInfo()};
+        if (terminalInfo[0] == null){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
 
-            @Nullable
-            @Override
-            public Object receiveOrNull(@NonNull Continuation<? super EmvMessage> continuation) {
-                return null;
-            }
+                    AllTerminalInfo allInfo = (AllTerminalInfo) iswTxnHandler.downloadTmKimParam(new Continuation<AllTerminalInfo>() {
+                        @NonNull
+                        @Override
+                        public CoroutineContext getContext() {
+                            return coroutineScope.getCoroutineContext();
+                        }
 
-            @NonNull
-            @Override
-            public SelectClause1<EmvMessage> getOnReceiveOrNull() {
-                return null;
-            }
+                        @Override
+                        public void resumeWith(@NonNull Object o) {
+                            Log.i("TAG", "resumeWith: ");
+                        }
+                    });
 
-            @Nullable
-            @Override
-            public Object receiveOrClosed(@NonNull Continuation<? super ValueOrClosed<? extends EmvMessage>> continuation) {
-                return null;
-            }
+                    if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
+                        terminalInfo[0] = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
+                        iswTxnHandler.saveTerminalInfo(terminalInfo[0]);
+                    }
 
-            @NonNull
-            @Override
-            public SelectClause1<ValueOrClosed<EmvMessage>> getOnReceiveOrClosed() {
-                return null;
-            }
+                    if (terminalInfo[0] != null){
+                        callback.onSuccess(terminalInfo[0], iswTxnHandler.getSerialNumber());
+                    }
+                }
+            }).start();
+        }
+    }
 
-            @Nullable
-            @Override
-            public EmvMessage poll() {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public ChannelIterator<EmvMessage> iterator() {
-                return null;
-            }
-
-            @Override
-            public void cancel(@Nullable CancellationException e) {
-
-            }
-
-            @Override
-            public boolean isClosedForSend() {
-                return false;
-            }
-
-            @Override
-            public boolean isFull() {
-                return false;
-            }
-
-            @Nullable
-            @Override
-            public Object send(EmvMessage emvMessage, @NonNull Continuation<? super Unit> continuation) {
-                return null;
-            }
-
-            @NonNull
-            @Override
-            public SelectClause2<EmvMessage, SendChannel<EmvMessage>> getOnSend() {
-                return null;
-            }
-
-            @Override
-            public boolean offer(EmvMessage emvMessage) {
-                return false;
-            }
-
-            @Override
-            public boolean close(@Nullable Throwable throwable) {
-                return false;
-            }
-
-            @Override
-            public void invokeOnClose(@NonNull Function1<? super Throwable, Unit> function1) {
-
-            }
-        }, new Continuation<Unit>() {
-            @NonNull
-            @Override
-            public CoroutineContext getContext() {
-                return coroutineScope.getCoroutineContext();
-            }
-
-            @Override
-            public void resumeWith(@NonNull Object o) {
-                Log.i("TAG", "resumeWith: ");
-            }
-        });
-        /*IswPos.getInstance().pay(amountToPay, new IswPos.IswPaymentCallback() {
-            @Override
-            public void onUserCancel() {
-                callback.onCancel();
-            }
-
-            @Override
-            public void onPaymentCompleted(@NonNull IswTransactionResult iswTransactionResult) {
-                ISW_TransactionResult result = new ISW_TransactionResult(iswTransactionResult.getResponseCode(),
-                        iswTransactionResult.getResponseMessage(), iswTransactionResult.isSuccessful(),
-                        iswTransactionResult.getTransactionReference(),
-                        iswTransactionResult.getAmount(), iswTransactionResult.getCardType().name(),
-                        iswTransactionResult.getTransactionType().name());
-                callback.onPaymentComplete(result);
-            }
-        }, new Transaction.Purchase((PaymentType) null), 0, 0);*/
+    public String getSerialNumber(){
+        return iswTxnHandler.getSerialNumber();
     }
 
     /*public static void goToSettings(){

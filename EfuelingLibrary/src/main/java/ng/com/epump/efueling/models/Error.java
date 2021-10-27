@@ -37,6 +37,6 @@ public class Error {
             errorString = "Library - " + LibraryErrorType.getString(errorCode);
         }
         String time = Utility.parseDate(Calendar.getInstance().getTime(), "EEE MMM dd, yyyy hh:mm aa");
-        return errorString + " - " + error +  " /n" + time;
+        return errorString + " - " + error +  "\n" + time;
     }
 }

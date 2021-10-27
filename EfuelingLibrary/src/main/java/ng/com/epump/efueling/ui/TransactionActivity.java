@@ -35,7 +35,7 @@ public class TransactionActivity extends AppCompatActivity {
     private Button btnEndTrans;
     private ImageView imgDismiss;
     private int pumpState, transactionState;
-    private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "";
+    private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "", vouchercardNumber;
     private double amount = 0, volume = 0, transValue = 0;
     private int transType;
     private int percentage = 0;
@@ -183,6 +183,7 @@ public class TransactionActivity extends AppCompatActivity {
             transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
             pumpName = getIntent().getStringExtra("Pump_Name");
             pumpDisplayName = getIntent().getStringExtra("Pump_Display_Name");
+            vouchercardNumber = getIntent().getStringExtra("voucher_card_number");
         }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
@@ -195,6 +196,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("transactionValue", transValue);
                 returnData.putExtra("transactionStarted", transactionStarted);
                 returnData.putExtra("transactionDate", transactionDate);
+                returnData.putExtra("voucherCardNumber", vouchercardNumber);
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();

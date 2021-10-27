@@ -22,11 +22,11 @@ def test_runner_version = '1.0.2'
 def concurrent_version = '0.4.4'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 31
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
@@ -128,7 +128,7 @@ dependencies {
     implementation fileTree(dir: 'C:\\Mobile_Dev\\epumpconnection\\ISW_POS\\libs', include: ['*.aar', '*.jar'], exclude: [])
     implementation fileTree(dir: 'C:\\Mobile_Dev\\epumpconnection\\ISW_POS\\libs', include: ['*.aar', '*.jar'], exclude: [])
     implementation fileTree(dir: 'C:\\Mobile_Dev\\epumpconnection\\ISW_POS\\libs', include: ['*.aar', '*.jar'], exclude: [])
-
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.1'
 
 
     testImplementation 'junit:junit:4.12'
@@ -150,6 +150,7 @@ dependencies {
     implementation 'com.github.javadev:underscore:1.64'
 
     //implementation project(':smart-pos-usb-release')
+    implementation 'de.esoco:coroutines:0.9.1'
 
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
