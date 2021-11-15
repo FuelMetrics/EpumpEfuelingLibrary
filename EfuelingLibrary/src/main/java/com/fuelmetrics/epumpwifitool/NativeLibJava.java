@@ -41,6 +41,7 @@ public class NativeLibJava {
     public native byte ep_get_value_ty();
     public native String ep_get_err_details();
     public native String ep_get_session_id();
+    public native int ep_is_command_acked();
 
     public native int ep_rx_data(String data, int len);
 
