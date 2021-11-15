@@ -24,6 +24,7 @@ public class ServerErrorType {
     public static final int VoucherCannotBeProcessed = -116;
     public static final int VoucherNotAllowed = -118;
     public static final int VoucherCanceledByOwner = -117;
+    public static final int VoucherExpired  = -128;
     public static final int InsufficientBalance = 118;
     public static final int UserWalletNotFound = 119;
     public static final int IncorrectPassword = 120;
@@ -79,7 +80,9 @@ public class ServerErrorType {
             case VoucherNotAllowed:
                 return "Voucher Not Allowed";
             case VoucherCanceledByOwner:
-                return "Voucher Canceled By Owner";
+                return "Voucher Canceled";
+            case VoucherExpired:
+                return "Voucher Expired";
             case InsufficientBalance:
                 return "Insufficient Balance";
             case UserWalletNotFound:

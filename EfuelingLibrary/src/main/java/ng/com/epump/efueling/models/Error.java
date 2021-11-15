@@ -1,5 +1,7 @@
 package ng.com.epump.efueling.models;
 
+import java.util.Calendar;
+
 public class Error {
     public static String getError(String error){
         String errorString = "";
@@ -21,6 +23,12 @@ public class Error {
             else if (errorCode == GoErrorType.EVT_SOCKET_ERROR.ordinal()){
                 errorString = "Network Error";
             }
+            else if (errorCode == GoErrorType.EVT_VALUE_IS_ZERO.ordinal()){
+                errorString = "Value cannot be zero";
+            }
+            else if (errorCode == GoErrorType.EVT_VALUE_IS_TOO_LOW.ordinal()){
+                errorString = "Transaction value too low";
+            }
             else {
                 errorString = "Unknown Error";
             }
@@ -28,6 +36,7 @@ public class Error {
         else if (errorType.equalsIgnoreCase(ErrorType.L.name())){
             errorString = "Library - " + LibraryErrorType.getString(errorCode);
         }
-        return errorString + " - " + error;
+        String time = Utility.parseDate(Calendar.getInstance().getTime(), "EEE MMM dd, yyyy hh:mm aa");
+        return errorString + " - " + error +  " /n" + time;
     }
 }

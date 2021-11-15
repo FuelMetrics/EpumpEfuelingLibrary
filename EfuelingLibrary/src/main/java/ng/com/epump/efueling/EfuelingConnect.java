@@ -13,20 +13,25 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkRequest;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WifiNetworkSpecifier;
 import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Parcelable;
+import android.os.Process;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
 import com.fuelmetrics.epumpwifitool.NativeLibJava;
 
 import java.io.BufferedReader;
@@ -35,16 +40,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
+import java.util.Objects;
 
+import ng.com.epump.efueling.interfaces.BluetoothUtilsCallback;
 import ng.com.epump.efueling.interfaces.IData;
-
-import com.fuelmetrics.epumpwifitool.JNICallbackInterface;
-
+import ng.com.epump.efueling.interfaces.TransactionCallback;
 import ng.com.epump.efueling.models.Ep_Run;
 import ng.com.epump.efueling.models.Transaction;
 import ng.com.epump.efueling.models.TransactionType;
@@ -64,20 +68,22 @@ public class EfuelingConnect implements JNICallbackInterface {
     private Context mContext;
     private IData data_interface;
     private WifiManager wifiManager;
+    private ConnectivityManager connectivityManager;
+    private ConnectivityManager.NetworkCallback networkCallback;
+    private BluetoothUtils mBluetoothUtils;
     private static boolean runCalled;
     private PrintWriter output;
     private Socket socket;
     private CountDownTimer countDownTimer, messageCountDownTimer;
-    private int wifiAvailability = 1;
-    private boolean disposed;
+    private int wifiAvailability = -1;
+    private boolean disposed = false;
     private Activity activity;
     private String mDailyKey = "";
     private String mTerminalId = "";
     private Date transactionDate;
     private int connectionTrial = 0;
     private Thread thread, epRun;
-    private ExecutorService executor;
-    private Future epRunFuture, socketFuture;
+    private Handler handler;
 
     private EfuelingConnect(Context context) {
         this.mContext = context;
@@ -106,7 +112,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             nativeLibJava.ep_end_trans();
         }*/
         nativeLibJava = new NativeLibJava(this);
-        data_interface = (IData) mContext;
+        /*data_interface = (IData) mContext;*/
     }
 
     public void init(String dailyKey) {
@@ -115,7 +121,12 @@ public class EfuelingConnect implements JNICallbackInterface {
 
     @Override
     public void tx_data(String data, int len) {
-        if (output != null) {
+        if(mBluetoothUtils != null){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                mBluetoothUtils.write(data);
+            }
+        }
+        else if (output != null) {
             output.println(data);
             output.flush();
         }
@@ -127,23 +138,14 @@ public class EfuelingConnect implements JNICallbackInterface {
         data_interface.tx_data(data, len);*/
     }
 
+    /*WiFi methods*/
     public void turnWifi(final boolean state) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-                if (!state) {
-                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        // TODO: Consider calling
-                        //    ActivityCompat#requestPermissions
-                        // here to request the missing permissions, and then overriding
-                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                        //                                          int[] grantResults)
-                        // to handle the case where the user grants the permission. See the documentation
-                        // for ActivityCompat#requestPermissions for more details.
-                        return;
-                    }
-                    else {
+                //if (!state) {
+                    if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                         List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
                         if (list != null){
                             for (WifiConfiguration i : list) {
@@ -151,13 +153,15 @@ public class EfuelingConnect implements JNICallbackInterface {
                                 wifiManager.removeNetwork(i.networkId);
                             }
                         }
+                        wifiManager.saveConfiguration();
                     }
-                }
+                //}
                 if (wifiManager.isWifiEnabled() != state) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                         Intent panelIntent = new Intent(Settings.Panel.ACTION_WIFI);
                         ((Activity)mContext).startActivityForResult(panelIntent, 223);
                     } else {
+                        wifiManager.setWifiEnabled(false);
                         wifiManager.setWifiEnabled(state);
                     }
                 }
@@ -170,7 +174,7 @@ public class EfuelingConnect implements JNICallbackInterface {
         return wifiManager.isWifiEnabled();
     }
 
-    public void connect2WifiAndSocket(String ssid, String password, final String ipAddress){
+    public void connect2WifiAndSocket(final String ssid, String password, final String ipAddress){
         do{
             Log.i("TAG", "run: switching wifi on");
         }
@@ -227,17 +231,28 @@ public class EfuelingConnect implements JNICallbackInterface {
                 }
             }
             if (cnt){
-                final ConnectivityManager connectivityManager = (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-                ConnectivityManager.NetworkCallback networkCallback = new ConnectivityManager.NetworkCallback(){
+                connectivityManager = (ConnectivityManager)mContext.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                networkCallback = new ConnectivityManager.NetworkCallback(){
                     @Override
                     public void onAvailable(@NonNull Network network) {
                         super.onAvailable(network);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            connectivityManager.bindProcessToNetwork(network);
+                        WifiInfo info = wifiManager.getConnectionInfo();
+                        String connectedSSID  = info.getSSID();
+                        if (connectedSSID != null){
+                            connectedSSID = connectedSSID.replaceAll("\"", "");
                         }
-                        if (!Utility.ConnectionStarted) {
-                            Utility.ConnectionStarted = true;
-                            handleConnect(ipAddress);
+                        if (Objects.equals(connectedSSID, ssid)){
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                connectivityManager.bindProcessToNetwork(network);
+                            }
+                            if (!Utility.ConnectionStarted) {
+                                Utility.ConnectionStarted = true;
+                                handleConnect(ipAddress);
+                            }
+                        }
+                        else {
+                            Utility.ConnectionStarted = false;
+                            Log.i("TAG", "onAvailable: wrong ssid connection");
                         }
                     }
 
@@ -249,10 +264,18 @@ public class EfuelingConnect implements JNICallbackInterface {
 
                     @Override
                     public void onLost(@NonNull Network network) {
-                        wifiAvailability = 2;
-                        super.onLost(network);
-                        Utility.ConnectionStarted = false;
-                        data_interface.initComplete(false);
+                        if (!disposed){
+                            wifiAvailability = 2;
+                            super.onLost(network);
+                            Utility.ConnectionStarted = false;
+
+                            Intent intent = new Intent("init_complete");
+                            intent.putExtra("status", false);
+                            LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+                            /*if (data_interface != null){
+                                data_interface.initComplete(false);
+                            }*/
+                        }
                     }
 
                     @Override
@@ -267,7 +290,8 @@ public class EfuelingConnect implements JNICallbackInterface {
         }
     }
 
-    private void handleConnect(String ipAddress){
+    private void handleConnect(String... ipAddress){
+        handler = new Handler(Looper.getMainLooper());
         wifiAvailability = 0;
 
         nativeLibJava.registerCallbacks();
@@ -307,8 +331,8 @@ public class EfuelingConnect implements JNICallbackInterface {
                 intent.putExtra("transaction_value", transValue);
                 intent.putExtra("transaction_type", transType);
                 intent.putExtra("transaction_session_id", transSessionId);
-                //LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
-                LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+                LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
+                //LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }
 
             @Override
@@ -327,18 +351,19 @@ public class EfuelingConnect implements JNICallbackInterface {
             epRun = new Thread(new Ep_Run(nativeLibJava));
             epRun.start();
         }
-        socketConnection(ipAddress);
+        if (ipAddress.length > 0){
+            socketConnection(ipAddress[0]);
+        }
     }
 
     private void socketConnection(final String ip){
-        final Handler handler = new Handler(Looper.getMainLooper());
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
 
                 try {
                     socket = new Socket(ip, 5555);
-                    socket.setKeepAlive(true);
+                    /*socket.setKeepAlive(true);*/
                     OutputStream out = socket.getOutputStream();
 
                     output = new PrintWriter(out);
@@ -347,33 +372,22 @@ public class EfuelingConnect implements JNICallbackInterface {
                         Log.d("TAG", "run: connecting");
                     }
                     while (!socket.isBound() && !socket.isConnected());
-                    data_interface.initComplete(true);
+                    /*if (data_interface != null){
+                        data_interface.initComplete(true);
+                    }*/
+                    Intent intent = new Intent("init_complete");
+                    intent.putExtra("status", true);
+                    LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
 
-                    final BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    do {
+                    while (socket != null && socket.isBound() && socket.isConnected() && !socket.isClosed()) {
+                        final BufferedReader input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                         final String st = input.readLine();
 
-                        handler.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                if (st != null) {
-                                    nativeLibJava.ep_rx_data(st, st.length());
-                                } else {
-                                    try {
-                                        output.close();
-                                        input.close();
-                                        socket.close();
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        });
-                    } while (socket != null && socket.isBound() && socket.isConnected() && !socket.isClosed());
+                        pushDataToLib(st);
+                    }
 
                     if (socket != null && socket.isClosed()) {
-                        if (!disposed && connectionTrial < 5){
+                        if (connectionTrial < 3){
                             connectionTrial++;
                             socketConnection(ip);
                         }
@@ -390,10 +404,52 @@ public class EfuelingConnect implements JNICallbackInterface {
         thread = new Thread(runnable);
         thread.start();
     }
+    /*WiFi methods ended*/
 
-    public int startTransaction(final TransactionType transactionType, final String pumpName,
-                                final String tag, final double amount) {
-        if (wifiAvailability == 0) {
+    private void pushDataToLib(final String dataToSend) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                if (dataToSend != null) {
+                    nativeLibJava.ep_rx_data(dataToSend, dataToSend.length());
+                }
+            }
+        });
+    }
+    /*BLE methods*/
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public boolean initBluetooth(String macAddress){
+        mBluetoothUtils = new BluetoothUtils(mContext, macAddress, new BluetoothUtilsCallback() {
+            @Override
+            public void onConnected() {
+                handleConnect();
+            }
+
+            @Override
+            public void onRead(String data) {
+                pushDataToLib(data);
+            }
+        });
+        return mBluetoothUtils.bLESupported();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public void startBLE(){
+        mBluetoothUtils.startBLE();
+    }
+
+    /*To be called on Stop*/
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+    public void closeGatt(){
+        mBluetoothUtils.closeGatt();
+    }
+    /*BLE methods ended*/
+
+    public void startTransaction(final TransactionType transactionType, final String pumpName, final String pumpDisplayName,
+                                 final String tag, final double amount, TransactionCallback callback) {
+        if (wifiAvailability <= 0) {
             final Calendar calendar = Calendar.getInstance();
             transactionDate = calendar.getTime();
             new Thread(new Runnable() {
@@ -415,9 +471,15 @@ public class EfuelingConnect implements JNICallbackInterface {
             Intent intent = new Intent(mContext, TransactionActivity.class);
             intent.putExtra("Transaction_Date", transactionDate.getTime());
             intent.putExtra("Pump_Name", pumpName);
+            intent.putExtra("Pump_Display_Name", pumpDisplayName);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
+            try{
+                TransactionActivity.setCallback(callback);
+            }
+            catch (Exception e){
+
+            }
         }
-        return wifiAvailability;
     }
 
     public void continueTransaction(){
@@ -428,6 +490,16 @@ public class EfuelingConnect implements JNICallbackInterface {
     public void dispose() {
         if (!disposed) {
             disposed = true;
+            Utility.ConnectionStarted = false;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                try {
+                    if (networkCallback != null && connectivityManager != null) {
+                        connectivityManager.unregisterNetworkCallback(networkCallback);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
             try{
                 if (thread != null) {
                     thread.interrupt();
@@ -449,17 +521,6 @@ public class EfuelingConnect implements JNICallbackInterface {
                     //nativeLibJava.ep_end_trans();
                     nativeLibJava.ep_deinit();
                 }
-
-                /*if (socketFuture != null && !socketFuture.isCancelled()){
-                    socketFuture.cancel(true);
-                }
-                if (epRunFuture != null && !epRunFuture.isCancelled()){
-                    epRunFuture.cancel(true);
-                }
-                if(executor != null && !executor.isShutdown()){
-                    executor.shutdown();
-                }
-                executor = null;*/
                 runCalled = false;
             }
             catch (Exception ex){
@@ -478,8 +539,17 @@ public class EfuelingConnect implements JNICallbackInterface {
                 e.printStackTrace();
             }
 
-            turnWifi(false);
+            if (mBluetoothUtils != null){
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                    mBluetoothUtils.closeGatt();
+                }
+                mBluetoothUtils = null;
+            }
+            else {
+                turnWifi(false);
+            }
             _connect = null;
+            //data_interface = null;
         }
     }
 
@@ -509,7 +579,8 @@ public class EfuelingConnect implements JNICallbackInterface {
         }
     }
 
-    public void readTransactions(int count){
+    public ArrayList<Transaction> readTransactions(int count){
+        ArrayList<Transaction> myTransactions = new ArrayList<>();
         int counter = 1;
         while (nativeLibJava.ep_get_transaction(counter) == 0 || counter <= count){
             byte transType = nativeLibJava.ep_read_trans_ty();
@@ -519,8 +590,9 @@ public class EfuelingConnect implements JNICallbackInterface {
 
             String transactionType = TransactionType.get(transType);
             String transactionValueType = TransactionValueType.get(transValueType);
-            new Transaction(transactionType, transId, transValue, transactionValueType);
+            myTransactions.add(new Transaction(transactionType, transId, transValue, transactionValueType));
             counter++;
         }
+        return myTransactions;
     }
 }

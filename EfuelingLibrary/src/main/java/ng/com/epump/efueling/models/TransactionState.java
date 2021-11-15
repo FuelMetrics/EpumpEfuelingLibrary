@@ -12,39 +12,39 @@ public class TransactionState {
     public static final int ST_ERROR = 8;
     public static final int ST_LIB_ERROR = 9;
 
-    public static String getString(int state, String... pumpName) {
+    public static String getString(int state, String pumpDisplayName) {
         String resp = "";
-        String pName = (pumpName != null && pumpName.length > 0) ? removeAlphabets(pumpName[0]) : "";
+        //String pName = (pumpName != null && pumpName.length > 0) ? removeAlphabets(pumpName[0]) : "";
         switch (state) {
             case ST_INIT:
                 resp = "Go setting up";
                 break;
             case ST_IDLE:
-                resp = "Initializing...";
+                resp = String.format("Initializing %s...", pumpDisplayName);
                 break;
             case ST_PUMP_BUSY:
-                resp = "Pump not ready";
+                resp = String.format("Pump (%s) not ready", pumpDisplayName);
                 break;
             case ST_REQUESTING_FROM_SERVER:
-                resp = "Processing request...";
+                resp = String.format("Processing request on %s...", pumpDisplayName);
                 break;
             case ST_PUMP_AUTH:
-                resp = "Transaction authorized, Pick Up Nozzle " + pName;
+                resp = String.format("Transaction authorized, Pick Up %s",  pumpDisplayName);
                 break;
             case ST_PUMP_FILLING:
-                resp = "Transaction in progress";
+                resp = String.format("Transaction in progress on %s...", pumpDisplayName);
                 break;
             case ST_PUMP_FILL_COMP:
-                resp = "Transaction completed";
+                resp = String.format("Transaction completed on %s", pumpDisplayName);
                 break;
             case ST_NULL:
-                resp = "Ready state";
+                resp = String.format("Ready state on %s", pumpDisplayName);
                 break;
             case ST_ERROR:
-                resp = "Transaction error: ";
+                resp = String.format("Transaction error on %s:", pumpDisplayName);
                 break;
             case ST_LIB_ERROR:
-                resp = "Library error: ";
+                resp = String.format("Library error on %s:", pumpDisplayName);
                 break;
             default:
                 resp = "-" + state;

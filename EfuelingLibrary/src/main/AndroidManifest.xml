@@ -2,22 +2,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="ng.com.epump.efueling">
-
-    <!--<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<!--
+    android:sharedUserId="android.uid.system"
+    coreApp="true"-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.NFC" />-->
-    <!--<uses-permission
-        android:name="android.permission.WRITE_SETTINGS"
-        tools:ignore="ProtectedPermissions" />-->
-    <!--<uses-permission android:name="android.permission.INTERNET" />-->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions"/>
 
     <application>
+<!--
+        android:process="system"-->
         <activity
             android:name=".ui.NFCActivity"
-            android:exported="true" />
+            android:exported="true"
+            android:theme="@style/Library_Theme"/>
         <activity
             android:name=".ui.TransactionActivity"
             android:theme="@style/Library_Theme" />
