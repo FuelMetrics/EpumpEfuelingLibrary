@@ -37,7 +37,7 @@ public class TransactionActivity extends AppCompatActivity {
     private int pumpState, transactionState;
     private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "", vouchercardNumber;
     private double amount = 0, volume = 0, transValue = 0;
-    private int transType;
+    private int transType, transactionAck;
     private int percentage = 0;
     private int return_value;
     private boolean transComplete, errorOccurred, transactionStarted;
@@ -48,7 +48,7 @@ public class TransactionActivity extends AppCompatActivity {
         public void onReceive(final Context context, Intent intent) {
             pumpState = intent.getIntExtra("pump_state", 0);
             transactionState = intent.getIntExtra("transaction_state", 0);
-            errorString = intent.getStringExtra("transaction_error_string");
+            transactionAck = intent.getIntExtra("transaction_acknowledged", 0);
             if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING){
                 transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
                 transType = intent.getByteExtra("transaction_type", (byte) 0x00);
@@ -125,6 +125,12 @@ public class TransactionActivity extends AppCompatActivity {
                             txtTransState.setTextColor(getResources().getColor(R.color.libraryColorPrimary));
                         }
                         errorOccurred = false;
+                    }
+
+                    if (transactionAck == 1){
+                        if (mCallback != null){
+                            mCallback.onStarted();
+                        }
                     }
 
                     if (transactionState == TransactionState.ST_PUMP_AUTH &&

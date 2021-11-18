@@ -113,10 +113,10 @@ public class Utility {
         return data.replace(mask, sb.toString());
     }
 
-    public static String getPrintHtmlFromAsset(Context context){
+    public static String getPrintHtmlFromAsset(Context context, String fileName){
         InputStream is = null;
         try {
-            is = context.getAssets().open("print.html");
+            is = context.getAssets().open(fileName);
             int size = is.available();
 
             byte[] buffer = new byte[size];

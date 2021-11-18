@@ -1,5 +1,7 @@
 package ng.com.epump.efueling.models;
 
+import android.util.Log;
+
 import java.util.Calendar;
 
 public class Error {
@@ -14,8 +16,9 @@ public class Error {
         }
         String[] err = error.split(":");
         String errorType = err[0];
-        int errorCode = Integer.parseInt(err[1]);
-        int errorMessageCode = Integer.parseInt(err[2]);
+        Log.i("TAG", "getError: " + error);
+        int errorCode = err.length > 1 ? Integer.parseInt(err[1]) : -1;
+        int errorMessageCode = err.length > 2 ? Integer.parseInt(err[2]) : -1;
         if (errorType.equalsIgnoreCase(ErrorType.G.name())){
             if (errorCode == GoErrorType.EVT_SERVER_ERROR.ordinal()){
                 errorString = ServerErrorType.getString(errorMessageCode);

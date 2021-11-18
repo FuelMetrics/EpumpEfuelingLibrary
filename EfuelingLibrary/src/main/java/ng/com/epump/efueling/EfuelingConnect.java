@@ -335,6 +335,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                 float transValue = nativeLibJava.ep_get_value();
                 byte transType = nativeLibJava.ep_get_value_ty();
                 String transSessionId = nativeLibJava.ep_get_session_id();
+                int transactionAck = nativeLibJava.ep_is_command_acked();
 
                 Intent intent = new Intent("get_States");
                 intent.putExtra("pump_state", pumpState);
@@ -345,6 +346,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                 intent.putExtra("transaction_value", transValue);
                 intent.putExtra("transaction_type", transType);
                 intent.putExtra("transaction_session_id", transSessionId);
+                intent.putExtra("transaction_acknowledged", transactionAck);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcastSync(intent);
                 //LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
             }

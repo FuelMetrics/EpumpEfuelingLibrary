@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="libraryColorPrimary">#320965</color>
+    <color name="libraryColorAccent">#84A0DD</color>
+    <color name="libraryColorGray">#707070</color>
+    <color name="libraryColorWhite">#FFFFFF</color>
+    <color name="libraryColorRed">#FF0000</color>
+    <color name="libraryGradientStart">#9DB6EA</color>
+    <color name="libraryGradientMid">#96B0E6</color>
+    <color name="libraryGradientEnd">#446ABE</color>
+    <color name="libraryTranCompleteColor">#24E979</color>
+</resources>

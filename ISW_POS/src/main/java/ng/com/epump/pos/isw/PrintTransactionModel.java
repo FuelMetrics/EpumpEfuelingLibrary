@@ -10,6 +10,7 @@ public class PrintTransactionModel {
     private String product;
     private String amount;
     private String volume;
+    private String voucherCardNumber;
     private boolean customerCopy;
 
     public String getStationName() {
@@ -82,6 +83,14 @@ public class PrintTransactionModel {
 
     public void setVolume(String volume) {
         this.volume = volume;
+    }
+
+    public String getVoucherCardNumber() {
+        return voucherCardNumber;
+    }
+
+    public void setVoucherCardNumber(String voucherCardNumber) {
+        this.voucherCardNumber = voucherCardNumber;
     }
 
     public boolean isCustomerCopy() {

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <corners android:radius="7sp"/>
+            <gradient
+                android:startColor="@color/libraryGradientEnd"
+                android:endColor="@color/libraryGradientStart"
+                android:type="linear"/>
+        </shape>
+    </item>
+    <item android:top="2sp"
+        android:left="1sp"
+        android:right="1sp">
+        <shape>
+            <corners android:radius="7sp"/>
+            <gradient
+                android:startColor="@color/libraryGradientMid"
+                android:endColor="@color/libraryGradientStart"
+                android:type="linear"/>
+        </shape>
+    </item>
+</layer-list>
