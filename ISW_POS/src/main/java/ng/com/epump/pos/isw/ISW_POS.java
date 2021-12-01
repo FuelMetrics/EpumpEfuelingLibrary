@@ -16,10 +16,8 @@ import com.interswitchng.smartpos.IswTxnHandler;
 import com.interswitchng.smartpos.emv.pax.services.POSDeviceImpl;
 import com.interswitchng.smartpos.models.core.Environment;
 import com.interswitchng.smartpos.models.core.POSConfig;
-import com.interswitchng.smartpos.models.core.TerminalInfo;
 import com.interswitchng.smartpos.models.posconfig.PrintObject;
 import com.interswitchng.smartpos.models.posconfig.PrintStringConfiguration;
-import com.interswitchng.smartpos.models.printer.info.PrintStatus;
 import com.interswitchng.smartpos.models.printer.info.TransactionType;
 import com.interswitchng.smartpos.models.transaction.TransactionLog;
 import com.interswitchng.smartpos.shared.interfaces.device.POSDevice;
@@ -49,6 +47,7 @@ public class ISW_POS {
     static String merchantCode = "MX5882";
     static String phoneNumber= "20390007";
     private static TerminalInfo terminalInfo;
+    private static com.interswitchng.smartpos.models.core.TerminalInfo iswInfo;
 
     public ISW_POS(Context context, boolean pax, TerminalInfoCallback callback) {
         if (mContext == null){
@@ -70,7 +69,11 @@ public class ISW_POS {
                 null, posConfig, false, false);
 
         iswTxnHandler = new IswTxnHandler(posDevice);
-        terminalInfo = iswTxnHandler.getTerminalInfo();
+        iswInfo = iswTxnHandler.getTerminalInfo();
+        if (iswInfo != null){
+            terminalInfo = new TerminalInfo(iswInfo);
+        }
+
         if (terminalInfo == null){
             new Thread(new Runnable() {
                 @Override
@@ -91,8 +94,9 @@ public class ISW_POS {
                     });
 
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
-                        terminalInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
-                        iswTxnHandler.saveTerminalInfo(terminalInfo);
+                        iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
+                        terminalInfo = new TerminalInfo(iswInfo);
+                        iswTxnHandler.saveTerminalInfo(iswInfo);
                         callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
                     }
                 }
@@ -109,7 +113,7 @@ public class ISW_POS {
 
                 boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
                 if (keyDownloaded){
-                    iswTxnHandler.getToken(terminalInfo, new Continuation<Unit>() {
+                    iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
                         @NonNull
                         @Override
                         public CoroutineContext getContext() {
@@ -171,8 +175,7 @@ public class ISW_POS {
         printObjects.add(new PrintObject.Data("01-6327474-5", normalTitleCenter));
         printObjects.add(new PrintObject.Data("\n", normal));
 
-        PrintStatus status = iswTxnHandler.checkPrintStatus();
-        String msg = status.getMessage();
+        String msg = iswTxnHandler.checkPrintStatus().getMessage();
 
 
 
@@ -197,11 +200,12 @@ public class ISW_POS {
     }
 
     public void printEOD(List<TransactionLog> transactionLogs, String date){
-        iswTxnHandler.printEod(TransactionType.Purchase,transactionLogs,date, terminalInfo);
+        iswTxnHandler.printEod(TransactionType.Purchase,transactionLogs,date, iswInfo);
     }
 
     public PrintStatus printTransaction(Bitmap bitmap){
-        return iswTxnHandler.printslip(bitmap);
+        com.interswitchng.smartpos.models.printer.info.PrintStatus status = iswTxnHandler.printslip(bitmap);
+        return new PrintStatus(status.getMessage());
     }
 
     public void setupTransaction(double amount, String amountString) throws Exception{
@@ -209,7 +213,8 @@ public class ISW_POS {
             throw new Exception("Call init method to initialize library");
         }
         int amountToPay = (int) (amount * 100);
-        terminalInfo = iswTxnHandler.getTerminalInfo();
+        iswInfo = iswTxnHandler.getTerminalInfo();
+        terminalInfo = new TerminalInfo(iswInfo);
 
         Intent intent = new Intent(mContext, CardTransactionActivity.class);
         intent.putExtra("amount_to_pay", amountToPay);
@@ -218,11 +223,13 @@ public class ISW_POS {
     }
 
     public PrintStatus printerStatus(){
-        return iswTxnHandler.checkPrintStatus();
+        com.interswitchng.smartpos.models.printer.info.PrintStatus status = iswTxnHandler.checkPrintStatus();
+        return new PrintStatus(status.getMessage());
     }
 
     public void getTerminal(TerminalInfoCallback callback){
-        final TerminalInfo[] terminalInfo = {iswTxnHandler.getTerminalInfo()};
+        iswInfo = iswTxnHandler.getTerminalInfo();
+        final TerminalInfo[] terminalInfo = {new TerminalInfo(iswInfo)};
         if (terminalInfo[0] == null){
             new Thread(new Runnable() {
                 @Override
@@ -243,8 +250,9 @@ public class ISW_POS {
                     });
 
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
-                        terminalInfo[0] = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
-                        iswTxnHandler.saveTerminalInfo(terminalInfo[0]);
+                        iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
+                        terminalInfo[0] = new TerminalInfo(iswInfo);
+                        iswTxnHandler.saveTerminalInfo(iswInfo);
                     }
 
                     if (terminalInfo[0] != null){
