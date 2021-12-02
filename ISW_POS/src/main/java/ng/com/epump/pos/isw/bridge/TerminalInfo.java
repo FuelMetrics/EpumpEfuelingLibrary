@@ -1,4 +1,4 @@
-package ng.com.epump.pos.isw;
+package ng.com.epump.pos.isw.bridge;
 
 public class TerminalInfo {
     private String agentEmail;

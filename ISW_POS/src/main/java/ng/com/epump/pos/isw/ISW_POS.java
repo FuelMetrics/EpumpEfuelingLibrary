@@ -31,6 +31,8 @@ import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.GlobalScope;
+import ng.com.epump.pos.isw.bridge.PrintStatus;
+import ng.com.epump.pos.isw.bridge.TerminalInfo;
 import ng.com.epump.pos.isw.ui.CardTransactionActivity;
 
 public class ISW_POS {
