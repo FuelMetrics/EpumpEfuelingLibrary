@@ -9,6 +9,15 @@
     tools:context=".ui.TransactionActivity">
 
     <ImageView
+        android:id="@+id/img_conn_mode"
+        android:layout_width="150sp"
+        android:layout_height="150sp"
+        android:src="@drawable/ic_bluetooth"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="50sp"/>
+
+    <ImageView
         android:id="@+id/imgDismiss"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -7,6 +7,8 @@ public class TerminalInfo {
     private String capabilities;
     private String countryCode;
     private String currencyCode;
+    private String merchantAlias;
+    private String merchantCode;
     private boolean isKimono;
     private boolean isKimono3;
     private String merchantCategoryCode;
@@ -18,17 +20,19 @@ public class TerminalInfo {
     private String serverUrl;
     private String terminalId;
 
-    public TerminalInfo(com.interswitchng.smartpos.models.core.TerminalInfo info) {
-        new TerminalInfo(info.getAgentEmail(), info.getAgentId(), info.getCallHomeTimeInMin(),
+    public static TerminalInfo getTerminalInfo(com.interswitchng.smartpos.models.core.TerminalInfo info) {
+        return new TerminalInfo(info.getAgentEmail(), info.getAgentId(), info.getCallHomeTimeInMin(),
                 info.getCapabilities(), info.getCountryCode(), info.getCurrencyCode(), info.isKimono(),
                 info.isKimono3(), info.getMerchantCategoryCode(), info.getMerchantId(), info.getMerchantNameAndLocation(),
-                info.getServerIp(), info.getServerPort(), info.getServerTimeoutInSec(), info.getServerUrl(), info.getTerminalId());
+                info.getMerchantCode(), info.getMerchantAlias(), info.getServerIp(), info.getServerPort(),
+                info.getServerTimeoutInSec(), info.getServerUrl(), info.getTerminalId());
     }
 
     public TerminalInfo(String agentEmail, String agentId, int callHomeTimeInMin, String capabilities,
                         String countryCode, String currencyCode, boolean isKimono, boolean isKimono3,
                         String merchantCategoryCode, String merchantId, String merchantNameAndLocation,
-                        String serverIp, int serverPort, int serverTimeoutInSec, String serverUrl,
+                        String merchantCode, String merchantAlias, String serverIp, int serverPort,
+                        int serverTimeoutInSec, String serverUrl,
                         String terminalId) {
         this.agentEmail = agentEmail;
         this.agentId = agentId;
@@ -118,6 +122,22 @@ public class TerminalInfo {
 
     public void setMerchantCategoryCode(String merchantCategoryCode) {
         this.merchantCategoryCode = merchantCategoryCode;
+    }
+
+    public String getMerchantAlias() {
+        return merchantAlias;
+    }
+
+    public void setMerchantAlias(String merchantAlias) {
+        this.merchantAlias = merchantAlias;
+    }
+
+    public String getMerchantCode() {
+        return merchantCode;
+    }
+
+    public void setMerchantCode(String merchantCode) {
+        this.merchantCode = merchantCode;
     }
 
     public String getMerchantId() {

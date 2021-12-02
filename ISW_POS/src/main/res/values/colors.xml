@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="libraryColorPrimary">#320965</color>
+    <color name="libraryColorWhite70">#B3FFFFFF</color>
     <color name="libraryColorAccent">#84A0DD</color>
     <color name="libraryColorGray">#707070</color>
     <color name="libraryColorWhite">#FFFFFF</color>

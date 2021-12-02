@@ -28,14 +28,15 @@
         <item name="android:textColor">@color/libraryColorPrimary</item>
         <item name="android:background">@drawable/library_button_background</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:layout_height">48sp</item>
         <item name="android:layout_margin">20sp</item>
     </style>
 
     <style name="AltButton" parent="android:style/Widget.Material.Button">
         <item name="android:textColor">@color/libraryColorWhite</item>
-        <item name="android:background">@color/libraryColorPrimary</item>
+        <item name="android:background">@drawable/library_alt_background</item>
+        <item name="background">@drawable/library_alt_background</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">16sp</item>
         <item name="android:layout_height">48sp</item>

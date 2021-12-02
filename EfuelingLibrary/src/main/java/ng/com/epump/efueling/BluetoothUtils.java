@@ -88,7 +88,9 @@ public class BluetoothUtils {
             if (Build.VERSION.SDK_INT < 21) {
                 mBluetoothAdapter.stopLeScan(mLeScanCallback);
             } else {
-                mLEScanner.stopScan(mScanCallback);
+                if (mLEScanner != null) {
+                    mLEScanner.stopScan(mScanCallback);
+                }
             }
             stopScan = true;
         }
@@ -149,7 +151,8 @@ public class BluetoothUtils {
                     Log.i("onLeScan", device.toString());
 
                     if (!bluetoothFound && !stopScan){
-                        if (device.getAddress() != null &&device.getAddress().equalsIgnoreCase(mMacAddr)){
+                        if ((device.getAddress() != null && device.getAddress().equalsIgnoreCase(mMacAddr))
+                        || (device.getName() != null && device.getName().equalsIgnoreCase(mMacAddr))){
                             bluetoothFound = true;
                             connectToDevice(device);
                             stopScan();
@@ -165,10 +168,12 @@ public class BluetoothUtils {
             /*Log.i("callbackType", String.valueOf(callbackType));
             Log.i("result", result.toString());*/
             BluetoothDevice btDevice = result.getDevice();
-            String devName = btDevice.getAddress();// result.getScanRecord().getDeviceName();
+            String devName = btDevice.getName();
+            String devAddress = btDevice.getAddress();// result.getScanRecord().getDeviceName();
 
             if (!bluetoothFound && !stopScan){
-                if (devName != null && devName.equalsIgnoreCase(mMacAddr)){
+                if ((devName != null && devName.equalsIgnoreCase(mMacAddr))
+                || (devAddress != null && devAddress.equalsIgnoreCase(mMacAddr))){
                     bluetoothFound = true;
                     connectToDevice(btDevice);
                 }
