@@ -1,34 +1,44 @@
 # EpumpEfuelingLibrary
 
 Add this to the module's build.gradle file
+```
 implementation 'com.github.FuelMetrics.EpumpEfuelingLibrary:EfuelingLibrary:0.0.1-beta03'
+```
 
-To start interaction with the library call the line below;
+### To start interaction with the library call the line below;
+```
 EfuelingConnect efuelingConnect = EfuelingConnect.getInstance(context);
 efuelingConnect.init(Common.SERVER_KEY, terminalId);
+```
 
-//For connection to the device
-//To be done on a new thread
+## For connection to the device
+To be done on a new thread
 
-//wifi
+### Connect with WiFi
+```
 efuelingConnect.turnWifi(true);
 efuelingConnect.connect2WifiAndSocket(ssid, password, ip_address);
+```
 
-//bluetooth
+### Connect with Bluetooth
+```
 if (efuelingConnect.initBluetooth(mac_address)){
-   efuelingConnect.startBLE();
+   efuelingConnect.startBLE();   
 }
+```
 
-//to start transaction
-efuelingConnect.startTransaction(transactionType, pumpName, pumpDisplayName, tag, amount, new TransactionCallback() {
+## Start Transaction
+```
+efuelingConnect.startTransaction(transactionType, pumpName, pumpDisplayName, tag, amount, new TransactionCallback() {	
 	@Override
-        public void onStarted() {
-                
-        }
+	public void onStarted() {
 
-        @Override
-        public void onCompleted() {
+	}
 
-        }
+	@Override
+	public void onCompleted() {
+
+	}	
 });
+```
 
