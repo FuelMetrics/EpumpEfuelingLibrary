@@ -55,6 +55,7 @@ public class NativeLibJava {
     public native double ep_read_trans_value();
     public native byte ep_read_trans_value_ty();
 
+
     /** for registering callback */
     public native int registerCallbacks();
     private void ep_trans_cb_java(String data, int len){
