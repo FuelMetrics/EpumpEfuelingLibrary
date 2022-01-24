@@ -9,10 +9,10 @@ public class EmvData {
     private String csn;
     private String pinKsn;
     private String src;
-    private String icc;
+    private Object icc;
 
     public EmvData(String AID, String cardExpiry, String cardPAN, String cardPIN,
-                   String cardTrack2, String csn, String pinKsn, String src, String icc) {
+                   String cardTrack2, String csn, String pinKsn, String src, Object icc) {
         this.AID = AID;
         this.cardExpiry = cardExpiry;
         this.cardPAN = cardPAN;
@@ -88,11 +88,11 @@ public class EmvData {
         this.src = src;
     }
 
-    public String getIcc() {
+    public Object getIcc() {
         return icc;
     }
 
-    public void setIcc(String icc) {
+    public void setIcc(Object icc) {
         this.icc = icc;
     }
 }

@@ -4,6 +4,18 @@
 
     <application>
         <activity
+            android:name=".ui.QRActivity"
+            android:exported="false"
+            android:theme="@style/Library_Theme" />
+        <activity
+            android:name=".ui.USSDActivity"
+            android:exported="false"
+            android:theme="@style/Library_Theme" />
+        <activity
+            android:name=".ui.PayCodeActivity"
+            android:exported="false"
+            android:theme="@style/Library_Theme" />
+        <activity
             android:name=".ui.CardTransactionActivity"
             android:exported="false"
             android:theme="@style/Library_Theme" />

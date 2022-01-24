@@ -34,6 +34,9 @@ import kotlinx.coroutines.GlobalScope;
 import ng.com.epump.pos.isw.bridge.PrintStatus;
 import ng.com.epump.pos.isw.bridge.TerminalInfo;
 import ng.com.epump.pos.isw.ui.CardTransactionActivity;
+import ng.com.epump.pos.isw.ui.PayCodeActivity;
+import ng.com.epump.pos.isw.ui.QRActivity;
+import ng.com.epump.pos.isw.ui.USSDActivity;
 
 public class ISW_POS {
     private PrintStringConfiguration bold, boldCenter, boldTitleCenter, normalTitleCenter, normalCenter, normal;
@@ -43,11 +46,16 @@ public class ISW_POS {
     public static IswTxnHandler iswTxnHandler;
     private static CoroutineScope coroutineScope;
     private Context mContext;
-    static String clientId = "IKIAB23A4E2756605C1ABC33CE3C287E27267F660D61";
+    /*static String clientId = "IKIAB23A4E2756605C1ABC33CE3C287E27267F660D61";
     static String clientSecret = "secret";
     static String alias = "000007";
     static String merchantCode = "MX5882";
-    static String phoneNumber= "20390007";
+    static String phoneNumber= "20390007";*/
+    public static String clientId = "IKIA4733CE041F41ED78E52BD3B157F3AAE8E3FE153D";
+    public static String clientSecret = "t1ll73stS3cr3t";
+    public static String alias = "002208";
+    public static String merchantCode = "MX1065";
+    public static String phoneNumber = "080311402392";
     private static TerminalInfo terminalInfo;
     private static com.interswitchng.smartpos.models.core.TerminalInfo iswInfo;
 
@@ -73,10 +81,11 @@ public class ISW_POS {
         iswTxnHandler = new IswTxnHandler(posDevice);
         iswInfo = iswTxnHandler.getTerminalInfo();
         if (iswInfo != null){
-            terminalInfo = new TerminalInfo(iswInfo);
+            terminalInfo = TerminalInfo.getTerminalInfo(iswInfo);
         }
 
-        if (terminalInfo == null){
+        if (terminalInfo == null  || terminalInfo.getTerminalId() == null || terminalInfo.getTerminalId().isEmpty())
+        {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -97,39 +106,59 @@ public class ISW_POS {
 
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
                         iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
-                        terminalInfo = new TerminalInfo(iswInfo);
+                        terminalInfo = TerminalInfo.getTerminalInfo(iswInfo);
                         iswTxnHandler.saveTerminalInfo(iswInfo);
                         callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
+
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                                boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
+                                if (keyDownloaded){
+                                    iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
+                                        @NonNull
+                                        @Override
+                                        public CoroutineContext getContext() {
+                                            return coroutineScope.getCoroutineContext();
+                                        }
+
+                                        @Override
+                                        public void resumeWith(@NonNull Object o) {
+
+                                        }
+                                    });
+                                }
+                            }
+                        }).start();
                     }
                 }
             }).start();
         }
         else{
             callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
-        }
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                    boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
+                    if (keyDownloaded){
+                        iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
+                            @NonNull
+                            @Override
+                            public CoroutineContext getContext() {
+                                return coroutineScope.getCoroutineContext();
+                            }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
+                            @Override
+                            public void resumeWith(@NonNull Object o) {
 
-                boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
-                if (keyDownloaded){
-                    iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
-                        @NonNull
-                        @Override
-                        public CoroutineContext getContext() {
-                            return coroutineScope.getCoroutineContext();
-                        }
-
-                        @Override
-                        public void resumeWith(@NonNull Object o) {
-
-                        }
-                    });
+                            }
+                        });
+                    }
                 }
-            }
-        }).start();
+            }).start();
+        }
     }
 
     public void PrintTransaction(PrintTransactionModel model) throws Exception{
@@ -210,18 +239,43 @@ public class ISW_POS {
         return new PrintStatus(status.getMessage());
     }
 
-    public void setupTransaction(double amount, String amountString) throws Exception{
+    public void setupTransaction(double amount, String amountString, IswTransactionType transactionType) throws Exception{
         if (posDevice == null){
             throw new Exception("Call init method to initialize library");
         }
         int amountToPay = (int) (amount * 100);
         iswInfo = iswTxnHandler.getTerminalInfo();
-        terminalInfo = new TerminalInfo(iswInfo);
+        terminalInfo = TerminalInfo.getTerminalInfo(iswInfo);
 
-        Intent intent = new Intent(mContext, CardTransactionActivity.class);
-        intent.putExtra("amount_to_pay", amountToPay);
-        intent.putExtra("amount_to_pay_string", amountString);
-        ((Activity)(mContext)).startActivityForResult(intent, 234);
+        Intent intent;
+        switch (transactionType) {
+            case CARD:
+                intent = new Intent(mContext, CardTransactionActivity.class);
+                intent.putExtra("amount_to_pay", amountToPay);
+                intent.putExtra("amount_to_pay_string", amountString);
+                ((Activity) (mContext)).startActivityForResult(intent, 234);
+                break;
+            case PAY_CODE:
+                intent = new Intent(mContext, PayCodeActivity.class);
+                intent.putExtra("amount_to_pay", amountToPay);
+                intent.putExtra("amount_to_pay_string", amountString);
+                ((Activity) (mContext)).startActivityForResult(intent, 234);
+                break;
+            case USSD:
+                intent = new Intent(mContext, USSDActivity.class);
+                intent.putExtra("amount_to_pay", amountToPay);
+                intent.putExtra("amount_to_pay_string", amountString);
+                ((Activity) (mContext)).startActivityForResult(intent, 234);
+                break;
+            case QR_CODE:
+                intent = new Intent(mContext, QRActivity.class);
+                intent.putExtra("amount_to_pay", amountToPay);
+                intent.putExtra("amount_to_pay_string", amountString);
+                ((Activity) (mContext)).startActivityForResult(intent, 234);
+                break;
+            default:
+                break;
+        }
     }
 
     public PrintStatus printerStatus(){
@@ -231,7 +285,7 @@ public class ISW_POS {
 
     public void getTerminal(TerminalInfoCallback callback){
         iswInfo = iswTxnHandler.getTerminalInfo();
-        final TerminalInfo[] terminalInfo = {new TerminalInfo(iswInfo)};
+        final TerminalInfo[] terminalInfo = {TerminalInfo.getTerminalInfo(iswInfo)};
         if (terminalInfo[0] == null){
             new Thread(new Runnable() {
                 @Override
@@ -253,7 +307,7 @@ public class ISW_POS {
 
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
                         iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
-                        terminalInfo[0] = new TerminalInfo(iswInfo);
+                        terminalInfo[0] = TerminalInfo.getTerminalInfo(iswInfo);
                         iswTxnHandler.saveTerminalInfo(iswInfo);
                     }
 

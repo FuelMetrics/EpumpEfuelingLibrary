@@ -33,9 +33,10 @@ public class TransactionActivity extends AppCompatActivity {
     private TextView txtTransState, txtProgress, txtAuthorizedAmount, txtVolume,
             txtAmount, txtValueType;
     private Button btnEndTrans;
-    private ImageView imgDismiss;
+    private ImageView imgDismiss, img_conn_mode;
     private int pumpState, transactionState;
-    private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "", vouchercardNumber;
+    private String errorString = "", sessionId = "", pumpName = "", pumpDisplayName = "",
+            vouchercardNumber, connectionMode;
     private double amount = 0, volume = 0, transValue = 0;
     private int transType, transactionAck;
     private int percentage = 0;
@@ -43,11 +44,13 @@ public class TransactionActivity extends AppCompatActivity {
     private boolean transComplete, errorOccurred, transactionStarted;
     private long transactionDate;
     private static TransactionCallback mCallback;
+    Intent returnData;
     BroadcastReceiver infoReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, Intent intent) {
             pumpState = intent.getIntExtra("pump_state", 0);
             transactionState = intent.getIntExtra("transaction_state", 0);
+            errorString = intent.getStringExtra("transaction_error_string");
             transactionAck = intent.getIntExtra("transaction_acknowledged", 0);
             if (transactionState == TransactionState.ST_PUMP_AUTH || transactionState == TransactionState.ST_PUMP_FILLING){
                 transValue = Double.parseDouble(Float.valueOf(intent.getFloatExtra("transaction_value", 0f)).toString());
@@ -185,17 +188,28 @@ public class TransactionActivity extends AppCompatActivity {
         txtValueType = findViewById(R.id.txtValueType);
         btnEndTrans = findViewById(R.id.btnEndTrans);
         imgDismiss = findViewById(R.id.imgDismiss);
+        img_conn_mode = findViewById(R.id.img_conn_mode);
         if (getIntent() != null){
             transactionDate = getIntent().getLongExtra("Transaction_Date", 0);
             pumpName = getIntent().getStringExtra("Pump_Name");
             pumpDisplayName = getIntent().getStringExtra("Pump_Display_Name");
             vouchercardNumber = getIntent().getStringExtra("voucher_card_number");
+            connectionMode = getIntent().getStringExtra("connection_mode");
+
+            if (connectionMode != null && !connectionMode.isEmpty()){
+                if(connectionMode.equalsIgnoreCase("bluetooth")){
+                    img_conn_mode.setImageResource(R.drawable.ic_bluetooth);
+                }
+                else if(connectionMode.equalsIgnoreCase("wifi")){
+                    img_conn_mode.setImageResource(R.drawable.ic_wifi);
+                }
+            }
         }
 
         btnEndTrans.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent returnData = new Intent();
+                returnData = new Intent();
                 returnData.putExtra("sessionId", sessionId);
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
@@ -206,13 +220,15 @@ public class TransactionActivity extends AppCompatActivity {
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();
+
+                mCallback.onCompleted(return_value, returnData);
             }
         });
 
         imgDismiss.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent returnData = new Intent();
+                returnData = new Intent();
                 returnData.putExtra("sessionId", sessionId);
                 returnData.putExtra("volume", volume);
                 returnData.putExtra("amount", amount);
@@ -240,6 +256,8 @@ public class TransactionActivity extends AppCompatActivity {
         super.onDestroy();
         LocalBroadcastManager.getInstance(context)
                 .unregisterReceiver(infoReceiver);
+
+        mCallback.onCompleted(return_value, returnData);
     }
 
     public static void setCallback(TransactionCallback callback){

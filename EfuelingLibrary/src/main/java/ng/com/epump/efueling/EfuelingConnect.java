@@ -84,6 +84,7 @@ public class EfuelingConnect implements JNICallbackInterface {
     private int connectionTrial = 0;
     private Thread thread, epRun;
     private Handler handler;
+    private String connectionMode;
 
     private EfuelingConnect(Context context) {
         this.mContext = context;
@@ -140,6 +141,7 @@ public class EfuelingConnect implements JNICallbackInterface {
 
     /*WiFi methods*/
     public void turnWifi(final boolean state) {
+        connectionMode = "wifi";
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -437,6 +439,7 @@ public class EfuelingConnect implements JNICallbackInterface {
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     public boolean initBluetooth(String macAddress){
+        connectionMode = "bluetooth";
         mBluetoothUtils = new BluetoothUtils(mContext, macAddress, new BluetoothUtilsCallback() {
             @Override
             public void onConnected() {
@@ -489,6 +492,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             intent.putExtra("Pump_Name", pumpName);
             intent.putExtra("Pump_Display_Name", pumpDisplayName);
             intent.putExtra("voucher_card_number", tag);
+            intent.putExtra("connection_mode", connectionMode);
             ((Activity) mContext).startActivityForResult(intent, TRANSACTION_START);
             try{
                 TransactionActivity.setCallback(callback);
@@ -600,6 +604,7 @@ public class EfuelingConnect implements JNICallbackInterface {
         ArrayList<Transaction> myTransactions = new ArrayList<>();
         int counter = 1;
         while (nativeLibJava.ep_get_transaction(counter) == 0 || counter <= count){
+            Log.i("TAG", "readTransactions: ------------------------------------------");
             byte transType = nativeLibJava.ep_read_trans_ty();
             String transId = nativeLibJava.ep_read_trans_uid();
             double transValue = nativeLibJava.ep_read_trans_value();
