@@ -56,6 +56,7 @@ public class NativeLibJava {
     public native byte ep_read_trans_value_ty();
     public native double ep_read_trans_vol_value();
     public native String ep_read_time_string();
+    public native String ep_read_pump_name();
 
     /** for registering callback */
     public native int registerCallbacks();
