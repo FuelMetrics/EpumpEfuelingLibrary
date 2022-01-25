@@ -49,7 +49,7 @@ public class NativeLibJava {
 
     /** APIs for getting previous transaction and
      * reading out each variable */
-    public native int ep_get_transaction(int index, String pumpname); //returns index read out
+    public native int ep_get_transaction(int index, String pumpname, int log_ty); //returns index read out
     public native byte ep_read_trans_ty();
     public native String ep_read_trans_uid();
     public native double ep_read_trans_value();
