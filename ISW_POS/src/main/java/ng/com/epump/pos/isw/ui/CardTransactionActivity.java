@@ -444,6 +444,7 @@ public class CardTransactionActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 startTransaction(cardType, accountType);
             }
         }).start();

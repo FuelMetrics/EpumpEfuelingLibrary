@@ -10,6 +10,7 @@ public enum TransactionValueType {
     }
 
     public static String get(int index){
+        index = (index == 0 || index == 97) ? 0 : 1;
         return values()[index].label;
     }
 }

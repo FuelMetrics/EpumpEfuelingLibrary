@@ -103,6 +103,7 @@ public class USSDActivity extends AppCompatActivity {
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                             CardLessPaymentInfo paymentInfo = new CardLessPaymentInfo(
                                     amount, "", 0,0
                             );
@@ -176,6 +177,7 @@ public class USSDActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                         Object object = iswTxnHandler.checkPaymentStatus(response.getTransactionReference(),
                                 terminalInfo.getMerchantCode(), PaymentType.USSD, new Continuation<PaymentStatus>() {
                                     @NonNull
