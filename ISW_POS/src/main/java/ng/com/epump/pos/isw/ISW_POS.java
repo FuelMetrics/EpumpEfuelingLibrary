@@ -74,7 +74,7 @@ public class ISW_POS {
         else{
             posDevice = TelpoPOSDeviceImpl.create(context);
         }
-        posConfig = new POSConfig(alias, clientId, clientSecret, merchantCode, phoneNumber, Environment.Test);
+        posConfig = new POSConfig(alias, clientId, clientSecret, merchantCode, phoneNumber, Environment.Production);
         IswPos.setupTerminal((Application) context.getApplicationContext(), posDevice,
                 null, posConfig, false, false);
 
@@ -107,6 +107,7 @@ public class ISW_POS {
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
                         iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
                         terminalInfo = TerminalInfo.getTerminalInfo(iswInfo);
+                        iswInfo.setKimono(false);
                         iswTxnHandler.saveTerminalInfo(iswInfo);
                         callback.onSuccess(terminalInfo, iswTxnHandler.getSerialNumber());
 
@@ -308,6 +309,7 @@ public class ISW_POS {
                     if (allInfo != null && allInfo.getResponseCode().equalsIgnoreCase("00")){
                         iswInfo = iswTxnHandler.getTerminalInfoFromResponse(allInfo);
                         terminalInfo[0] = TerminalInfo.getTerminalInfo(iswInfo);
+                        iswInfo.setKimono(false);
                         iswTxnHandler.saveTerminalInfo(iswInfo);
                     }
 

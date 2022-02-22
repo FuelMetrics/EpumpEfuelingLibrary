@@ -217,6 +217,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("transactionStarted", transactionStarted);
                 returnData.putExtra("transactionDate", transactionDate);
                 returnData.putExtra("voucherCardNumber", vouchercardNumber);
+                returnData.putExtra("transactionCompleted", transComplete);
                 return_value = -1;
                 setResult(return_value, returnData);
                 finish();
@@ -235,6 +236,7 @@ public class TransactionActivity extends AppCompatActivity {
                 returnData.putExtra("transactionValue", transValue);
                 returnData.putExtra("transactionStarted", transactionStarted);
                 returnData.putExtra("transactionDate", transactionDate);
+                returnData.putExtra("transactionCompleted", transComplete);
                 if (transComplete || errorOccurred){
                     return_value = -1;
                 }

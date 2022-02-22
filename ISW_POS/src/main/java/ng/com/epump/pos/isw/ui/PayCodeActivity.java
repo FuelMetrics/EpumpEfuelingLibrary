@@ -1,5 +1,6 @@
 package ng.com.epump.pos.isw.ui;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -22,6 +23,9 @@ import com.interswitchng.smartpos.models.transaction.TransactionResult;
 import com.interswitchng.smartpos.shared.models.transaction.CardLessPaymentInfo;
 import com.interswitchng.smartpos.shared.services.iso8583.utils.IsoUtils;
 
+import kotlin.Unit;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
 import kotlinx.coroutines.CoroutineScope;
 import kotlinx.coroutines.GlobalScope;
 import ng.com.epump.pos.isw.ISW_POS;
@@ -83,6 +87,19 @@ public class PayCodeActivity extends AppCompatActivity {
                     terminalInfo.setMerchantCode(ISW_POS.merchantCode);
                     terminalInfo.setMerchantAlias(ISW_POS.alias);
                 }
+                iswTxnHandler.getToken(terminalInfo, new Continuation<Unit>() {
+                    @NonNull
+                    @Override
+                    public CoroutineContext getContext() {
+                        return coroutineScope.getCoroutineContext();
+                    }
+
+                    @Override
+                    public void resumeWith(@NonNull Object o) {
+
+                    }
+                });
+
                 TransactionResult result = iswTxnHandler.processPayCode(terminalInfo,
                         new CardLessPaymentInfo(amountToPay, "", 0, 0), payCode);
 

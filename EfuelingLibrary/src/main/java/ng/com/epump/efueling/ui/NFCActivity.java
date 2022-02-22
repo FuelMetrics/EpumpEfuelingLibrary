@@ -29,10 +29,13 @@ public class NFCActivity extends AppCompatActivity {
     String[][] techList;
     Intent mIntent;
     String cardId;
+    boolean getPin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc);
+
+        getPin = getIntent().getBooleanExtra("get_pin", true);
 
         initNfcAdapter();
 
@@ -124,7 +127,15 @@ public class NFCActivity extends AppCompatActivity {
         Tag nfcTag = mIntent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         if (nfcTag != null){
             cardId = Utility.bytesToHexString(nfcTag.getId());
-            showPinInput();
+            if (getPin) {
+                showPinInput();
+            }
+            else{
+                Intent returndata = new Intent();
+                returndata.putExtra("Card_ID", cardId);
+                setResult(0, returndata);
+                finish();
+            }
         }
         else{
             setResult(-1);

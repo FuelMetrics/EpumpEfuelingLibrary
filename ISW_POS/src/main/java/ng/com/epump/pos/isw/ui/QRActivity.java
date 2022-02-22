@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Process;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -112,6 +113,7 @@ public class QRActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
+                        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                         Object object = iswTxnHandler.checkPaymentStatus(response.getTransactionReference(),
                                 terminalInfo.getMerchantCode(), PaymentType.QR, new Continuation<PaymentStatus>() {
                                     @NonNull
@@ -156,6 +158,7 @@ public class QRActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 CardLessPaymentInfo paymentInfo = new CardLessPaymentInfo(
                         amount, "", 0,0
                 );

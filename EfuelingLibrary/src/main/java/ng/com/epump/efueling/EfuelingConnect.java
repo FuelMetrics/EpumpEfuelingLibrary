@@ -50,6 +50,7 @@ import ng.com.epump.efueling.interfaces.BluetoothUtilsCallback;
 import ng.com.epump.efueling.interfaces.IData;
 import ng.com.epump.efueling.interfaces.TransactionCallback;
 import ng.com.epump.efueling.models.Ep_Run;
+import ng.com.epump.efueling.models.GO_TransactionType;
 import ng.com.epump.efueling.models.Transaction;
 import ng.com.epump.efueling.models.TransactionType;
 import ng.com.epump.efueling.models.TransactionValueType;
@@ -145,6 +146,7 @@ public class EfuelingConnect implements JNICallbackInterface {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                 wifiManager = (WifiManager) activity.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
                 //if (!state) {
                     if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -411,7 +413,7 @@ public class EfuelingConnect implements JNICallbackInterface {
                         }
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
             }
         };
@@ -474,6 +476,7 @@ public class EfuelingConnect implements JNICallbackInterface {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
                     int yy = calendar.get(Calendar.YEAR);
                     int mon = calendar.get(Calendar.MONTH);
                     int dd = calendar.get(Calendar.DATE);
@@ -580,8 +583,9 @@ public class EfuelingConnect implements JNICallbackInterface {
         }
     }
 
-    public void readNFC() {
+    public void readNFC(boolean withPin) {
         Intent intent = new Intent(activity, NFCActivity.class);
+        intent.putExtra("get_pin", withPin);
         intent.setFlags(0);
         try {
             activity.startActivityForResult(intent, EP_NFC_REQUEST_CODE);
@@ -600,19 +604,27 @@ public class EfuelingConnect implements JNICallbackInterface {
         }
     }
 
-    public ArrayList<Transaction> readTransactions(int count){
+    public ArrayList<Transaction> readTransactions(int count, String pumpName, int transactionMode){
         ArrayList<Transaction> myTransactions = new ArrayList<>();
-        int counter = 1;
-        while (nativeLibJava.ep_get_transaction(counter) == 0 || counter <= count){
-            Log.i("TAG", "readTransactions: ------------------------------------------");
-            byte transType = nativeLibJava.ep_read_trans_ty();
-            String transId = nativeLibJava.ep_read_trans_uid();
-            double transValue = nativeLibJava.ep_read_trans_value();
-            byte transValueType = nativeLibJava.ep_read_trans_value_ty();
+        int counter = 0;
+        while (nativeLibJava.ep_get_transaction(counter, pumpName, transactionMode) == 0 && myTransactions.size() < count){
+            String name = nativeLibJava.ep_read_pump_name();
+            if (name.equalsIgnoreCase(pumpName)) {
+                Log.i("TAG", "readTransactions: ------------------------------------------");
+                byte transType = nativeLibJava.ep_read_trans_ty();
+                String transId = nativeLibJava.ep_read_trans_uid();
+                double transAmount = nativeLibJava.ep_read_trans_value();
+                byte transValueType = nativeLibJava.ep_read_trans_value_ty();
 
-            String transactionType = TransactionType.get(transType);
-            String transactionValueType = TransactionValueType.get(transValueType);
-            myTransactions.add(new Transaction(transactionType, transId, transValue, transactionValueType));
+                double transVolume = nativeLibJava.ep_read_trans_vol_value();
+                String transTime = nativeLibJava.ep_read_time_string();
+
+                if (transType < GO_TransactionType.Last.ordinal()) {
+                    String transactionType = GO_TransactionType.get(transType);
+                    String transactionValueType = TransactionValueType.get(transValueType);
+                    myTransactions.add(new Transaction(transactionType, transId, transAmount, transVolume, transTime, transactionValueType));
+                }
+            }
             counter++;
         }
         return myTransactions;

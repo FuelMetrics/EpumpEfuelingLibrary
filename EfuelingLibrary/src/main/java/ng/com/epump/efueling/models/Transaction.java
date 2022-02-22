@@ -3,13 +3,17 @@ package ng.com.epump.efueling.models;
 public class Transaction {
     private String Type;
     private String Id;
-    private double Value;
+    private double Amount;
+    private double Volume;
+    private String Time;
     private String ValueType;
 
-    public Transaction(String type, String id, double value, String valueType) {
+    public Transaction(String type, String id, double amount, double volume, String time, String valueType) {
         Type = type;
         Id = id;
-        Value = value;
+        Amount = amount;
+        Volume = volume;
+        Time = time;
         ValueType = valueType;
     }
 
@@ -29,12 +33,28 @@ public class Transaction {
         Id = id;
     }
 
-    public double getValue() {
-        return Value;
+    public double getAmount() {
+        return Amount;
     }
 
-    public void setValue(double value) {
-        Value = value;
+    public void setAmount(double amount) {
+        Amount = amount;
+    }
+
+    public double getVolume() {
+        return Volume;
+    }
+
+    public void setVolume(double volume) {
+        Volume = volume;
+    }
+
+    public String getTime() {
+        return Time;
+    }
+
+    public void setTime(String time) {
+        Time = time;
     }
 
     public String getValueType() {
