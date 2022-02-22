@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements IData {
                             }
 
                             @Override
-                            public void onCompleted() {
+                            public void onCompleted(int resultCode, Intent intent) {
 
                             }
                         });
