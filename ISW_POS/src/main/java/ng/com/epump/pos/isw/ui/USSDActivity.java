@@ -194,7 +194,7 @@ public class USSDActivity extends AppCompatActivity {
                                                 layoutProcessingTransaction.setVisibility(View.GONE);
                                                 PaymentStatus status = (PaymentStatus) responseObject;
                                                 QR_USSD_TransactionResult result = new QR_USSD_PaymentStatus().getResponse(status);
-                                                if (result.getPaymentStatus() == Payment_Status.PENDING) {
+                                                if (result.getPaymentStatus() == Payment_Status.PENDING || result.getPaymentStatus() == Payment_Status.ERROR) {
                                                     btnContinue.setEnabled(true);
                                                     Toast.makeText(context, result.getMessage(), Toast.LENGTH_LONG).show();
                                                 }

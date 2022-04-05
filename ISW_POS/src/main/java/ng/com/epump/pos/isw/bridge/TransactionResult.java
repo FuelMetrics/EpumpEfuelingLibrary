@@ -30,6 +30,8 @@ public class TransactionResult {
     private String time;
     private TransactionType type;
 
+    public TransactionResult(){}
+
     public TransactionResult(String AID, String amount, String authorizationCode, String cardExpiry,
                              String cardPan, String cardPin, String cardTrack2, CardType cardType,
                              String code, String csn, String dateTime, int hasPrintedCustomerCopy,
