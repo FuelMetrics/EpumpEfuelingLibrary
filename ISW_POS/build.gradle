@@ -1,6 +1,6 @@
 plugins {
     id 'com.android.library'
-    id 'com.github.dcendents.android-maven'
+    //id 'com.github.dcendents.android-maven'
     id 'kotlin-android'
     id 'kotlin-kapt'
 }
@@ -52,9 +52,7 @@ android {
 }
 
 repositories {
-    flatDir {
-        dirs 'libs'
-    }
+    flatDir { dirs "C:\\mob_dev\\FM\\EpumpEfuelingLibrary\\ISW_POS\\libs".split(",") }
 }
 
 dependencies {
@@ -62,12 +60,18 @@ dependencies {
 
     api fileTree(dir: 'libs', include: ['*.jar'])
     // aar
-    new File('ISW_POS/libs').traverse(
+    /*new File('ISW_POS/libs').traverse(
             nameFilter: ~/.*\.aar/
     ) { file ->
         def name = file.getName().replace('.aar', '')
         api(name: name, ext: 'aar')
-    }
+    }*/
+    implementation files('libs/smart-pos-core-release.aar')
+    implementation files('libs/smart-pos-emv-pax-release.aar')
+    implementation files('libs/smart-pos-emv-telpo-release.aar')
+    /*implementation(name: 'smart-pos-core-release', ext: 'aar')
+    implementation(name: 'smart-pos-emv-pax-release', ext: 'aar')
+    implementation(name: 'smart-pos-emv-telpo-release', ext: 'aar')*/
 
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.google.android.material:material:1.4.0'

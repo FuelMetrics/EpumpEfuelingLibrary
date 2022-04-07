@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -137,6 +138,21 @@ public class Utility {
         Bitmap bitmap = null;
         try {
             istr = assetManager.open("print_logo.png");
+            bitmap = BitmapFactory.decodeStream(istr);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
+
+    public static Bitmap getIswLogoBitmapFromAsset(Context context) {
+        AssetManager assetManager = context.getAssets();
+
+        InputStream istr;
+        Bitmap bitmap = null;
+        try {
+            istr = assetManager.open("isw_logo.png");
             bitmap = BitmapFactory.decodeStream(istr);
         } catch (IOException e) {
             e.printStackTrace();
