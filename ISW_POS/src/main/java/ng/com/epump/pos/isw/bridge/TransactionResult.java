@@ -1,5 +1,7 @@
 package ng.com.epump.pos.isw.bridge;
 
+import com.google.gson.Gson;
+
 public class TransactionResult {
     private String AID;
     private String amount;

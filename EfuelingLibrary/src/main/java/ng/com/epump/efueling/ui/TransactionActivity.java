@@ -245,6 +245,8 @@ public class TransactionActivity extends AppCompatActivity {
                 }
                 setResult(return_value, returnData);
                 finish();
+
+                mCallback.onCompleted(return_value, returnData);
             }
         });
 

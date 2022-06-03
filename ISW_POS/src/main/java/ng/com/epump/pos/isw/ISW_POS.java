@@ -115,7 +115,7 @@ public class ISW_POS {
                             @Override
                             public void run() {
                                 Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                                boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
+                                boolean keyDownloaded = iswTxnHandler.downloadNibssKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), false);
                                 if (keyDownloaded){
                                     iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
                                         @NonNull
@@ -142,7 +142,7 @@ public class ISW_POS {
                 @Override
                 public void run() {
                     Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND);
-                    boolean keyDownloaded = iswTxnHandler.downloadKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), true);
+                    boolean keyDownloaded = iswTxnHandler.downloadNibssKeys(terminalInfo.getTerminalId(), terminalInfo.getServerIp(), terminalInfo.getServerPort(), false);
                     if (keyDownloaded){
                         iswTxnHandler.getToken(iswInfo, new Continuation<Unit>() {
                             @NonNull

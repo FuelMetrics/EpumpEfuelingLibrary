@@ -110,9 +110,11 @@ public class BluetoothUtils {
         if(mBluetoothAdapter != null && mGatt != null){
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
                 //mGatt.beginReliableWrite();
-                writeCharacteristics.setValue(data.getBytes());
-                if (!mGatt.writeCharacteristic(writeCharacteristics)){
-                    Log.e("TAG", "Failed to write characteristics: " + writeCharacteristics.toString());
+                if (writeCharacteristics != null && data != null) {
+                    writeCharacteristics.setValue(data.getBytes());
+                    if (!mGatt.writeCharacteristic(writeCharacteristics)) {
+                        Log.e("TAG", "Failed to write characteristics: " + writeCharacteristics.toString());
+                    }
                 }
             }
         }

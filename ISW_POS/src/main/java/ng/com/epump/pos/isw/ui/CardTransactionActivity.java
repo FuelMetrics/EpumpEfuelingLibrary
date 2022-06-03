@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -151,6 +152,7 @@ public class CardTransactionActivity extends AppCompatActivity {
                         return null;
                     }
 
+                    @SuppressLint("UnsafeOptInUsageError")
                     @Nullable
                     @Override
                     public Object receiveOrClosed(@NonNull Continuation<? super ValueOrClosed<? extends EmvMessage>> continuation) {
